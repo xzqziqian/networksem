@@ -1,0 +1,171 @@
+
+#' Fit a sem model with network data using node latent positions and/or network statistics as variables. User-specified network statistics will be calculated and used as variables instead of the networks themselves in the SEM.
+#' @param model a model specified in lavaan model syntax.
+#' @param data a data frame containing the observed non-network nodal variables
+#' @param network a named list of networks that will be used in the SEM
+#' @param netstats a user-specified list of network statistics to be calculated and used in the SEM, e.g., c("degree", "betweenness"), available options include "degree", "betweenness", "closeness", "evcent", "stresscent", and "infocent" from the "sna" package and "ivi", "hubness.score", "spreading.score" and "clusterRank" from the "influential" package
+#' @param netstats.options a user-specified named list with element names corresponding to the network statistics names and element values corresponding to other lists. The list corresponding to each network statistics name has element names being the argument names for calculating the network statistics, and values being the argument values, as used in the corresponding functions in the "sna" or "influential" packages. e.g., netstats.options=list("degree"=list("cmode"="freeman"), "closeness"=list("cmode"="undirected"), "clusterRank"=list("directed"=FALSE))
+#' @param netstats.rescale a list of logical value indicating whether to rescale network statistics to have mean 0 and sd 1.
+#' @param ordered parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal
+#' @param sampling.weights parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data
+#' @param group parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model
+#' @param cluster parameter same as "cluster" in the lavaan sem() function; whether to fit a cluster model
+#' @param constraints parameter same as "constraints" in the lavaan sem() function; whether to apply constraints to the model
+#' @param WLS.V parameter same as "WLS.V" in the lavaan sem() function; whether to use WLS.V estimator
+#' @param NACOV parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator
+#' @param ... optional arguments for the sem() function
+#' @return the updated model specification with the network statistics as variables and a lavaan object which is the SEM results
+#' @export
+sem.net.lsm <- function(model=NULL, data=NULL, network=NULL,
+                    ordered = NULL, sampling.weights = NULL,
+                    netstats.rescale=TRUE, group = NULL, cluster = NULL,
+                    constraints = "", WLS.V = NULL, NACOV = NULL,
+                    netstats.options=NULL, ...){
+  ## checking proper input
+  if(is.null(model)){
+    stop("required argument model is not specified.")
+  }
+  if(is.null(data)){
+    stop("required argument data is not specified.")
+  }
+  if(is.null(network)){
+    stop("required argument network is not specified.")
+  }
+
+ params <- c(as.list(environment()), list(...))
+
+
+  ## get the variable names in the model
+  model.info <- lavParseModelString(model)
+  model.var <- unique(c(model.info$lhs, model.info$rhs))
+
+  ## non-network data variable names
+  data.nonnetwork.var <- names(data)
+
+  ## network data variable names
+  if (!is.null(network)){
+    data.network.var <- names(network)
+  }
+
+  ## find the network variables in the model
+  model.network.var <- data.network.var[data.network.var %in% model.var]
+
+  ## create variables for network data and model
+  ## add network data variables to the non-network data
+
+  latent.vars <- list()
+
+
+    model.lavaanify <- lavaanify(model)
+
+    ## get the use specified model information
+    model.user <- model.lavaanify[model.lavaanify$user==1, ]
+
+    lat.var.pred.net <- list()
+    for (i in 1:nrow(model.user)){
+      if ((model.user$lhs[i] %in% model.network.var) && !(model.user$rhs[i] %in% model.network.var)){
+        if (is.null(lat.var.pred.net[[model.user$lhs[i]]])){
+          lat.var.pred.net[[model.user$lhs[i]]] <- c(model.user$rhs[i])
+        }else{
+          lat.var.pred.net[[model.user$lhs[i]]] <- c(model.user$rhs[i], lat.var.pred.net[[model.user$lhs[i]]])
+        }
+
+      }
+    }
+
+
+
+
+      for (i in 1:length(model.network.var)){
+        if (paste0("lp.", model.network.var[i]) %in% lat.var.pred.net[[model.network.var[i]]]){
+          fit <- ergmm(network[[model.network.var[i]]] ~ euclidean(d=3))
+          data[paste0(model.network.var[i], ".Z1")] <- fit$mcmc.mle$Z[,1]
+          data[paste0(model.network.var[i], ".Z2")] <- fit$mcmc.mle$Z[,2]
+          data[paste0(model.network.var[i], ".Z3")] <- fit$mcmc.mle$Z[,3]
+          latent.vars[[model.network.var[i]]] <- c(paste0(model.network.var[i], ".Z1"),paste0(model.network.var[i], ".Z2"), paste0(model.network.var[i], ".Z3"))
+        }
+      }
+
+
+
+
+  #print(model.network.stat.var.list)
+  ## reconstruct the path model with the network variables
+  ## replace the network variable name with the network variable stats name
+
+  ## lavaanify the model
+  model.lavaanify <- lavaanify(model)
+
+  ## get the use specified model information
+  model.user <- model.lavaanify[model.lavaanify$user==1, ]
+
+
+
+  ## now process each part of the user specified model
+  model.to.remove.index <- NULL
+  model.to.add <- ""
+  for (i in 1:nrow(model.user)){
+
+    ## check if left is network and right is latent position, remove this
+    if (model.user$lhs[i] %in% model.network.var && (grepl("lp.", model.user$rhs[i], fixed = TRUE))){
+      ## if it is, record the index i and create new model items
+      model.to.remove.index <- c(model.to.remove.index, i)
+    }
+    ## check if right is latent position and left is other variables
+    if (grepl("lp.", model.user$lhs[i], fixed = TRUE) && (!(model.user$rhs[i] %in% model.network.var))){
+      ## if it is, record the index i and create new model items
+      model.to.remove.index <- c(model.to.remove.index, i)
+      model.stat.var.to.add <- latent.vars[[substring(model.user$lhs[i], 4)]]
+      for (j in 1:length(model.stat.var.to.add)){
+        model.temp <- paste0("\n ", model.stat.var.to.add[j], model.user$op[i], model.user$rhs[i])
+        model.to.add <- paste0(model.to.add, model.temp)
+      }
+    }
+    ## left is latent position and right is others
+    if (grepl("lp.", model.user$rhs[i], fixed = TRUE) && (!(model.user$lhs[i] %in% model.network.var))){
+      ## if it is, record the index i and create new model items
+      model.to.remove.index <- c(model.to.remove.index, i)
+      model.stat.var.to.add <- latent.vars[[substring(model.user$rhs[i], 4)]]
+      for (j in 1:length(model.stat.var.to.add)){
+        model.temp <- paste0("\n ", model.user$lhs[i], model.user$op[i], model.stat.var.to.add[j])
+        model.to.add <- paste0(model.to.add, model.temp)
+      }
+    }
+  }
+
+  model.remove.network.var <- model.user[-model.to.remove.index, ]
+  model.non.network.var <- ""
+  for (i in 1:nrow(model.remove.network.var)){
+    model.non.network.var.temp <- paste0(paste0(model.remove.network.var[i, c('lhs', 'op', 'rhs')], collapse = ' '))
+    model.non.network.var <- paste0(model.non.network.var.temp, "\n", model.non.network.var)
+  }
+
+  model.full <- paste0(model.non.network.var, "\n", model.to.add)
+
+
+
+  lavparams <- list()
+  for (i in 1:length(params)){
+    if (names(params)[i] %in% names(lavOptions())){
+      lavparams[[names(params[i])]] <- params[[i]]
+    }
+  }
+
+  lavparams[["data"]] <- data
+  lavparams[["model"]] <- model.full
+  lavparams[["ordered"]] <- ordered
+  lavparams[["sampling.weights"]] <- sampling.weights
+  lavparams[["group"]] <- group
+  lavparams[["cluster"]] <- cluster
+  lavparams[["constraints"]] <- constraints
+  lavparams[["WLS.V"]] <- WLS.V
+  lavparams[["NACOV"]] <- NACOV
+
+  model.res <- do.call(what="sem", args=c(lavparams))
+
+
+  list(model=model.full, estimates=model.res)
+}
+
+
+
