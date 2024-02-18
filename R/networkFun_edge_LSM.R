@@ -10,10 +10,12 @@
 #' @param constraints parameter same as "constraints" in the lavaan sem() function; whether to apply constraints to the model
 #' @param WLS.V parameter same as "WLS.V" in the lavaan sem() function; whether to use WLS.V estimator
 #' @param NACOV parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator
+#' @param latent.dim number of network latent dimensions to use
 #' @param ... optional arguments for the sem() function
 #' @return the updated model specification with the network statistics as variables and a lavaan object which is the SEM results
 #' @export
 sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="difference",
+                             latent.dim = 3,
                     ordered = NULL, sampling.weights = NULL,
                     group = NULL, cluster = NULL,
                     constraints = "", WLS.V = NULL, NACOV = NULL,
@@ -75,7 +77,7 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
   cov.mani <- list()
   edgeatt<-list()
 
-  model.lavaanify <- lavaanify(model)
+  model.lavaanify <- lavaan::lavaanify(model)
 
   ## get the use specified model information
   model.user <- model.lavaanify[model.lavaanify$user==1, ]
@@ -160,8 +162,8 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
           }
         }
 
-        formu <- "ergmm(net ~ euclidean(d=3)"
-        net <- network(network[[model.network.var[i]]])
+        formu <- "latentnet::ergmm(net ~ euclidean(d=latent.dim)"
+        net <- network::network(network[[model.network.var[i]]])
 
         for (j in 1:length(lat.var.pred.net.cov)){
           # set.vertex.attribute(net, lat.var.pred.net.cov[[j]], data[, lat.var.pred.net.cov[[j]]])
@@ -186,15 +188,15 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
         # lsm.fit = ergmm(net~euclidean(d=2) + edgecov(as.matrix(net, attrname="age")) + edgecov(as.matrix(net, attrname="smoke")))
 
       }else{
-        net <- network(network[[model.network.var[i]]])
-        lsm.fit <- ergmm(net~ euclidean(d=3))
+        net <- network::network(network[[model.network.var[i]]])
+        lsm.fit <- latentnet::ergmm(net~ euclidean(d=latent.dim))
       }
 
-
-      p1 <- outer(lsm.fit$mcmc.mle$Z[,1], lsm.fit$mcmc.mle$Z[,1], "-")^2
-      p2 <- outer(lsm.fit$mcmc.mle$Z[,2], lsm.fit$mcmc.mle$Z[,2], "-")^2
-      p3 <- outer(lsm.fit$mcmc.mle$Z[,3], lsm.fit$mcmc.mle$Z[,3], "-")^2
-      dists <- array(t(sqrt(p1+p2+p3)))
+      distsum <- 0
+      for (dimind in 1:latent.dim){
+        distsum = distsum + outer(lsm.fit$mcmc.mle$Z[,dimind], lsm.fit$mcmc.mle$Z[,dimind], "-")^2
+      }
+      dists <- array(t(sqrt(distsum)))
 
 
       data_edge[paste0(model.network.var[i], ".dists")] <- dists
@@ -216,7 +218,7 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
   ## replace the network variable name with the network variable stats name
 
   ## lavaanify the model
-  model.lavaanify <- lavaanify(model)
+  model.lavaanify <- lavaan::lavaanify(model)
 
   ## get the use specified model information
   model.user <- model.lavaanify[model.lavaanify$user==1, ]
