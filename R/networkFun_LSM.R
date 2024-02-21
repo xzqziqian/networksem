@@ -13,10 +13,11 @@
 #' @param constraints parameter same as "constraints" in the lavaan sem() function; whether to apply constraints to the model
 #' @param WLS.V parameter same as "WLS.V" in the lavaan sem() function; whether to use WLS.V estimator
 #' @param NACOV parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator
+#' @param latent.dim number of network latent dimensions to use
 #' @param ... optional arguments for the sem() function
 #' @return the updated model specification with the network statistics as variables and a lavaan object which is the SEM results
 #' @export
-sem.net.lsm <- function(model=NULL, data=NULL, network=NULL,
+sem.net.lsm <- function(model=NULL, data=NULL, network=NULL, latent.dim = 3,
                     ordered = NULL, sampling.weights = NULL,
                     netstats.rescale=TRUE, group = NULL, cluster = NULL,
                     constraints = "", WLS.V = NULL, NACOV = NULL,
@@ -36,7 +37,7 @@ sem.net.lsm <- function(model=NULL, data=NULL, network=NULL,
 
 
   ## get the variable names in the model
-  model.info <- lavParseModelString(model)
+  model.info <- lavaan::lavParseModelString(model)
   model.var <- unique(c(model.info$lhs, model.info$rhs))
 
   ## non-network data variable names
@@ -56,7 +57,7 @@ sem.net.lsm <- function(model=NULL, data=NULL, network=NULL,
   latent.vars <- list()
 
 
-    model.lavaanify <- lavaanify(model)
+    model.lavaanify <- lavaan::lavaanify(model)
 
     ## get the use specified model information
     model.user <- model.lavaanify[model.lavaanify$user==1, ]
@@ -78,11 +79,12 @@ sem.net.lsm <- function(model=NULL, data=NULL, network=NULL,
 
       for (i in 1:length(model.network.var)){
         if (paste0("lp.", model.network.var[i]) %in% lat.var.pred.net[[model.network.var[i]]]){
-          fit <- ergmm(network[[model.network.var[i]]] ~ euclidean(d=3))
-          data[paste0(model.network.var[i], ".Z1")] <- fit$mcmc.mle$Z[,1]
-          data[paste0(model.network.var[i], ".Z2")] <- fit$mcmc.mle$Z[,2]
-          data[paste0(model.network.var[i], ".Z3")] <- fit$mcmc.mle$Z[,3]
-          latent.vars[[model.network.var[i]]] <- c(paste0(model.network.var[i], ".Z1"),paste0(model.network.var[i], ".Z2"), paste0(model.network.var[i], ".Z3"))
+          fit <- latentnet::ergmm(network::network(network[[model.network.var[i]]]) ~ euclidean(d=latent.dim))
+          latent.vars[[model.network.var[i]]] <- c()
+          for (dimind in 1:latent.dim){
+            data[paste0(model.network.var[i], ".Z", dimind)] <- fit$mcmc.mle$Z[,dimind]
+            latent.vars[[model.network.var[i]]] <- c(latent.vars[[model.network.var[i]]], paste0(model.network.var[i], ".Z", dimind))
+          }
         }
       }
 
@@ -94,7 +96,7 @@ sem.net.lsm <- function(model=NULL, data=NULL, network=NULL,
   ## replace the network variable name with the network variable stats name
 
   ## lavaanify the model
-  model.lavaanify <- lavaanify(model)
+  model.lavaanify <- lavaan::lavaanify(model)
 
   ## get the use specified model information
   model.user <- model.lavaanify[model.lavaanify$user==1, ]

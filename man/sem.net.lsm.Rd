@@ -8,6 +8,7 @@ sem.net.lsm(
   model = NULL,
   data = NULL,
   network = NULL,
+  latent.dim = 3,
   ordered = NULL,
   sampling.weights = NULL,
   netstats.rescale = TRUE,
@@ -26,6 +27,8 @@ sem.net.lsm(
 \item{data}{a data frame containing the observed non-network nodal variables}
 
 \item{network}{a named list of networks that will be used in the SEM}
+
+\item{latent.dim}{number of network latent dimensions to use}
 
 \item{ordered}{parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal}
 

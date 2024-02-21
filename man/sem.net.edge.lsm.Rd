@@ -9,6 +9,7 @@ sem.net.edge.lsm(
   data = NULL,
   network = NULL,
   type = "difference",
+  latent.dim = 3,
   ordered = NULL,
   sampling.weights = NULL,
   group = NULL,
@@ -27,6 +28,8 @@ sem.net.edge.lsm(
 \item{network}{a named list of networks that will be used in the SEM}
 
 \item{type}{"difference" for using the difference between the network statistics of the two actors as the edge covariate; "average" for using the average of the network statistics of the two actors as the edge covariate}
+
+\item{latent.dim}{number of network latent dimensions to use}
 
 \item{ordered}{parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal}
 
