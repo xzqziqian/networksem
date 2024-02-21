@@ -45,7 +45,7 @@ sem.net.edge(
 \item{...}{optional arguments for the sem() function}
 }
 \value{
-the updated model specification and a lavaan object which is the SEM results
+the updated model specification and a lavaan object which is the SEM results, and the data generated
 }
 \description{
 Fit a sem model with network data using edges as variables. User-specified network statistics will be calculated and used as variables instead of the networks themselves in the SEM.

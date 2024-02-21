@@ -12,7 +12,7 @@
 #' @param NACOV parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator
 #' @param latent.dim number of network latent dimensions to use
 #' @param ... optional arguments for the sem() function
-#' @return the updated model specification with the network statistics as variables and a lavaan object which is the SEM results
+#' @return the updated model specification with the network statistics as variables and a lavaan object which is the SEM results, also the data generated
 #' @export
 sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="difference",
                              latent.dim = 3,
@@ -301,5 +301,5 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
   model.res <- do.call(what="sem", args=c(lavparams))
 
 
-  list(model=model.full, estimates=list(sem.es=model.res,lsm.es=lsm.fit))
+  list(model=model.full, estimates=list(sem.es=model.res,lsm.es=lsm.fit), data = data_edge)
 }

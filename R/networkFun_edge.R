@@ -11,7 +11,7 @@
 #' @param WLS.V parameter same as "WLS.V" in the lavaan sem() function; whether to use WLS.V estimator
 #' @param NACOV parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator
 #' @param ... optional arguments for the sem() function
-#' @return the updated model specification and a lavaan object which is the SEM results
+#' @return the updated model specification and a lavaan object which is the SEM results, and the data generated
 #' @export
 sem.net.edge <- function(model = NULL, data = NULL, network = NULL, type = "difference",
                     ordered = NULL, sampling.weights = NULL,
@@ -145,5 +145,5 @@ sem.net.edge <- function(model = NULL, data = NULL, network = NULL, type = "diff
   model.res <- do.call(what="sem", args=c(lavparams))
 
 
-  list(model=model, estimates=model.res)
+  list(model=model, estimates=model.res, data=data_edge)
 }

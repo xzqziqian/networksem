@@ -166,7 +166,7 @@ sem.net.lsm <- function(model=NULL, data=NULL, network=NULL, latent.dim = 3,
   model.res <- do.call(what="sem", args=c(lavparams))
 
 
-  list(model=model.full, estimates=model.res)
+  list(model=model.full, estimates=model.res, data=data)
 }
 
 

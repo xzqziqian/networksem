@@ -48,7 +48,7 @@ sem.net.edge.lsm(
 \item{...}{optional arguments for the sem() function}
 }
 \value{
-the updated model specification with the network statistics as variables and a lavaan object which is the SEM results
+the updated model specification with the network statistics as variables and a lavaan object which is the SEM results, also the data generated
 }
 \description{
 Fit a sem model with network data using latent distances between actors as variables
