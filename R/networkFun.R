@@ -12,6 +12,9 @@
 #' @return a list with the first value being the list of network statistics names and the second value being the data frame with added network statistics
 #' @export
 sem.net.addvar.stat <- function(model.network.stat.var.list, data, model.network.var.i, stats, statsname, netstats.rescale, netstats.options=NULL){
+  degree <- sna::degree
+  betweenness <- sna::betweenness
+  closeness <- sna::closeness
   ## create the network stats variable name
   model.network.stat.var <- paste0(model.network.var.i, ".", statsname)
 
@@ -20,7 +23,7 @@ sem.net.addvar.stat <- function(model.network.stat.var.list, data, model.network
 
 
   ## using do.call to calculate the network statistics in variable list, add statistics to nonnetwork data
-  args <- list("dat"=data$network[model.network.var.i])
+  args <- list("dat"=data$network[[model.network.var.i]])
   args <- c(args, netstats.options)
   data$nonnetwork[[model.network.stat.var]] <- do.call(what=stats, args=args)
 
