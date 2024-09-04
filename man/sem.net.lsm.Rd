@@ -7,8 +7,7 @@
 sem.net.lsm(
   model = NULL,
   data = NULL,
-  network = NULL,
-  latent.dim = 3,
+  latent.dim = 2,
   ordered = NULL,
   sampling.weights = NULL,
   netstats.rescale = TRUE,
@@ -24,9 +23,7 @@ sem.net.lsm(
 \arguments{
 \item{model}{a model specified in lavaan model syntax.}
 
-\item{data}{a data frame containing the observed non-network nodal variables}
-
-\item{network}{a named list of networks that will be used in the SEM}
+\item{data}{a list containing both the non-network and network data}
 
 \item{latent.dim}{number of network latent dimensions to use}
 

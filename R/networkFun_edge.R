@@ -1,7 +1,6 @@
 #' Fit a sem model with network data using edges as variables. User-specified network statistics will be calculated and used as variables instead of the networks themselves in the SEM.
 #' @param model a model specified in lavaan model syntax.
-#' @param data a data frame containing the observed non-network nodal variables
-#' @param network a named list of networks that will be used in the SEM
+#' @param data a list containing both the non-network and network data
 #' @param type "difference" for using the difference between the network statistics of the two actors as the edge covariate; "average" for using the average of the network statistics of the two actors as the edge covariate
 #' @param ordered parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal
 #' @param sampling.weights parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data
@@ -13,7 +12,7 @@
 #' @param ... optional arguments for the sem() function
 #' @return the updated model specification and a lavaan object which is the SEM results, and the data generated
 #' @export
-sem.net.edge <- function(model = NULL, data = NULL, network = NULL, type = "difference",
+sem.net.edge <- function(model = NULL, data = NULL, type = "difference",
                     ordered = NULL, sampling.weights = NULL,
                     group = NULL, cluster = NULL,
                     constraints = "", WLS.V = NULL, NACOV = NULL,
@@ -25,9 +24,7 @@ sem.net.edge <- function(model = NULL, data = NULL, network = NULL, type = "diff
   if(is.null(data)){
     stop("required argument data is not specified.")
   }
-  if(is.null(network)){
-    stop("required argument network is not specified.")
-  }
+
 
  params <- c(as.list(environment()), list(...))
 
@@ -37,11 +34,11 @@ sem.net.edge <- function(model = NULL, data = NULL, network = NULL, type = "diff
   model.var <- unique(c(model.info$lhs, model.info$rhs))
 
   ## non-network data variable names
-  data.nonnetwork.var <- names(data)
+  data.nonnetwork.var <- names(data$nonnetwork)
 
   ## network data variable names
-  if (!is.null(network)){
-    data.network.var <- names(network)
+  if (!is.null(data$network)){
+    data.network.var <- names(data$network)
   }
 
   ## find the network variables in the model
@@ -50,19 +47,17 @@ sem.net.edge <- function(model = NULL, data = NULL, network = NULL, type = "diff
   ## create variables for network data and model
   ## add network data variables to the non-network data
   model.network.stat.var.list <- list()
-
-  data_edge = data.frame(row_actor=rep(NA, nrow(data)^2), col_actor=rep(NA, nrow(data)^2))
-
+  data_edge = data.frame(row_actor=rep(NA, nrow(data$nonnetwork)^2), col_actor=rep(NA, nrow(data$nonnetwork)^2))
   for (i in 1:length(model.network.var)){
     data_edge[model.network.var[i]]=NA
   }
   if (length(model.network.var)>0){
-      for (i in 1:nrow(data)){
-        for (j in 1:nrow(data)){
-          data_edge[j+(i-1)*nrow(data), "row_actor"]=i
-          data_edge[j+(i-1)*nrow(data), "col_actor"]=j
+      for (i in 1:nrow(data$nonnetwork)){
+        for (j in 1:nrow(data$nonnetwork)){
+          data_edge[j+(i-1)*nrow(data$nonnetwork), "row_actor"]=i
+          data_edge[j+(i-1)*nrow(data$nonnetwork), "col_actor"]=j
           for (netind in 1:length(model.network.var)){
-            data_edge[j+(i-1)*nrow(data),model.network.var[netind]]=network[[netind]][i,j]
+            data_edge[j+(i-1)*nrow(data$nonnetwork), model.network.var[netind]]=network[[netind]][i,j]
           }
         }
       }
@@ -87,10 +82,10 @@ sem.net.edge <- function(model = NULL, data = NULL, network = NULL, type = "diff
   variables.to.change=c()
   for (i in 1:nrow(model.user)){
     ## check if the variable on the lhs is a nonnetwork variable
-    if (model.user$lhs[i] %in% colnames(data) && !model.user$lhs[i] %in% model.network.var){
+    if (model.user$lhs[i] %in% colnames(data$nonnetwork) && !model.user$lhs[i] %in% model.network.var){
       variables.to.change <- c(variables.to.change, model.user$lhs[i])
     }
-    if (model.user$rhs[i] %in% colnames(data) && !model.user$rhs[i] %in% model.network.var){
+    if (model.user$rhs[i] %in% colnames(data$nonnetwork) && !model.user$rhs[i] %in% model.network.var){
       variables.to.change <- c(variables.to.change, model.user$rhs[i])
     }
   }
@@ -102,8 +97,8 @@ sem.net.edge <- function(model = NULL, data = NULL, network = NULL, type = "diff
 
   if (length(variables.to.change)>0){
     for (vind in 1:length(variables.to.change)){
-      v_row <- rep(data[variables.to.change[vind]][[1]], each=nrow(data))
-      v_col <- rep(data[variables.to.change[vind]][[1]], nrow(data))
+      v_row <- rep(data$nonnetwork[variables.to.change[vind]][[1]], each=nrow(data$nonnetwork))
+      v_col <- rep(data$nonnetwork[variables.to.change[vind]][[1]], nrow(data$nonnetwork))
       if (type=="difference"){
         data_edge[variables.to.change[vind]] <- v_row - v_col
       }else if (type=="average"){

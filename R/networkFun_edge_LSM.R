@@ -1,7 +1,6 @@
 #' Fit a sem model with network data using latent distances between actors as variables
 #' @param model a model specified in lavaan model syntax.
-#' @param data a data frame containing the observed non-network nodal variables
-#' @param network a named list of networks that will be used in the SEM
+#' @param data a list containing both the non-network and network data
 #' @param type "difference" for using the difference between the network statistics of the two actors as the edge covariate; "average" for using the average of the network statistics of the two actors as the edge covariate
 #' @param ordered parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal
 #' @param sampling.weights parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data
@@ -14,8 +13,8 @@
 #' @param ... optional arguments for the sem() function
 #' @return the updated model specification with the network statistics as variables and a lavaan object which is the SEM results, also the data generated
 #' @export
-sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="difference",
-                             latent.dim = 3,
+sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
+                             latent.dim = 2,
                     ordered = NULL, sampling.weights = NULL,
                     group = NULL, cluster = NULL,
                     constraints = "", WLS.V = NULL, NACOV = NULL,
@@ -27,9 +26,7 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
   if(is.null(data)){
     stop("required argument data is not specified.")
   }
-  if(is.null(network)){
-    stop("required argument network is not specified.")
-  }
+
 
  params <- c(as.list(environment()), list(...))
 
@@ -40,39 +37,40 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
 
 
   ## non-network data variable names
-  data.nonnetwork.var <- names(data)
+  data.nonnetwork.var <- names(data$nonnetwork)
+
 
   ## network data variable names
-  if (!is.null(network)){
-    data.network.var <- names(network)
+  if (!is.null(data$network)){
+    data.network.var <- names(data$network)
   }
 
   ## find the network variables in the model
   model.network.var <- data.network.var[data.network.var %in% model.var]
 
 
-  data_edge = data.frame(row_actor=rep(NA, nrow(data)^2), col_actor=rep(NA, nrow(data)^2))
+
+  data_edge = data.frame(row_actor=rep(NA, nrow(data$nonnetwork)^2), col_actor=rep(NA, nrow(data$nonnetwork)^2))
 
   for (i in 1:length(model.network.var)){
     data_edge[model.network.var[i]]=NA
   }
   if (length(model.network.var)>0){
-    for (i in 1:nrow(data)){
-      for (j in 1:nrow(data)){
-        data_edge[j+(i-1)*nrow(data), "row_actor"]=i
-        data_edge[j+(i-1)*nrow(data), "col_actor"]=j
+    for (i in 1:nrow(data$nonnetwork)){
+      for (j in 1:nrow(data$nonnetwork)){
+        data_edge[j+(i-1)*nrow(data$nonnetwork), "row_actor"]=i
+        data_edge[j+(i-1)*nrow(data$nonnetwork), "col_actor"]=j
         for (netind in 1:length(model.network.var)){
-          data_edge[j+(i-1)*nrow(data),model.network.var[netind]]=network[[netind]][i,j]
+          data_edge[j+(i-1)*nrow(data$nonnetwork),model.network.var[netind]]=data$network[[netind]][i,j]
         }
       }
     }
-
   }
 
 
 
   latent.vars <- list()
-  lsm.fit <- NULL
+  lsm.fit <- list()
   fit.prev <- NULL
   cov.mani <- list()
   edgeatt<-list()
@@ -83,13 +81,14 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
   model.user <- model.lavaanify[model.lavaanify$user==1, ]
 
 
+  ## change nonnetwork variable to be pairwise
   variables.to.change=c()
   for (i in 1:nrow(model.user)){
     ## check if the variable on the lhs is a nonnetwork variable
-    if (model.user$lhs[i] %in% colnames(data) && !model.user$lhs[i] %in% model.network.var){
+    if (model.user$lhs[i] %in% colnames(data$nonnetwork) && !model.user$lhs[i] %in% model.network.var){
       variables.to.change <- c(variables.to.change, model.user$lhs[i])
     }
-    if (model.user$rhs[i] %in% colnames(data) && !model.user$rhs[i] %in% model.network.var){
+    if (model.user$rhs[i] %in% colnames(data$nonnetwork) && !model.user$rhs[i] %in% model.network.var){
       variables.to.change <- c(variables.to.change, model.user$rhs[i])
     }
   }
@@ -101,8 +100,8 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
 
   if (length(variables.to.change)>0){
     for (vind in 1:length(variables.to.change)){
-      v_row <- rep(data[variables.to.change[vind]][[1]], each=nrow(data))
-      v_col <- rep(data[variables.to.change[vind]][[1]], nrow(data))
+      v_row <- rep(data$nonnetwork[variables.to.change[vind]][[1]], each = nrow(data$nonnetwork))
+      v_col <- rep(data$nonnetwork[variables.to.change[vind]][[1]], nrow(data$nonnetwork))
       if (type=="difference"){
         data_edge[variables.to.change[vind]] <- v_row - v_col
       }else if (type=="average"){
@@ -112,6 +111,7 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
     }
   }
 
+  ## variables predicting latent positions of social networks
   lat.var.pred.net <- list()
   for (i in 1:nrow(model.user)){
     if ((model.user$lhs[i] %in% model.network.var) && !(model.user$rhs[i] %in% model.network.var)){
@@ -120,19 +120,15 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
       }else{
         lat.var.pred.net[[model.user$lhs[i]]] <- c(model.user$rhs[i], lat.var.pred.net[[model.user$lhs[i]]])
       }
-
     }
   }
 
+
+  # find cov in LSM, fit LSM with cov model
   for (i in 1:length(model.network.var)){
-
-
     if (paste0("lp.", model.network.var[i]) %in% lat.var.pred.net[[model.network.var[i]]]){
-
-
       # filter out the covariates
       lat.var.pred.net.cov <- lat.var.pred.net[[model.network.var[i]]][!grepl("lp.", lat.var.pred.net[[model.network.var[i]]], fixed = TRUE)]
-
       if (length(lat.var.pred.net.cov)>0){
         for (j in 1:length(lat.var.pred.net.cov)){
           for (k in 1:nrow(model.user)){
@@ -142,7 +138,6 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
               }else{
                 cov.mani[[model.user$lhs[k]]] <- c(model.user$rhs[k],  cov.mani[[model.user$lhs[k]]])
               }
-
             }
           }
         }
@@ -163,12 +158,12 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
         }
 
         formu <- "latentnet::ergmm(net ~ euclidean(d=latent.dim)"
-        net <- network::network(network[[model.network.var[i]]])
+        net <- network::network(data$network[[model.network.var[i]]])
 
         for (j in 1:length(lat.var.pred.net.cov)){
           # set.vertex.attribute(net, lat.var.pred.net.cov[[j]], data[, lat.var.pred.net.cov[[j]]])
           #as.matrix(net, attrname="age")
-          val <- matrix(data_edge[,lat.var.pred.net.cov[[j]]], nrow=nrow(data), byrow=T)
+          val <- matrix(data_edge[,lat.var.pred.net.cov[[j]]], nrow=nrow(data$nonnetwork), byrow=T)
           set.edge.value(net, lat.var.pred.net.cov[[j]], val)
           # edgeatt[[j]] <- val
 
@@ -181,15 +176,15 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
 
         formu_parsed <- parse(text=formu)
         assign("net",net,envir = globalenv())
-        lsm.fit <- eval(formu_parsed)
+        lsm.fit <- c(lsm.fit, eval(formu_parsed))
 
 
 
         # lsm.fit = ergmm(net~euclidean(d=2) + edgecov(as.matrix(net, attrname="age")) + edgecov(as.matrix(net, attrname="smoke")))
 
       }else{
-        net <- network::network(network[[model.network.var[i]]])
-        lsm.fit <- latentnet::ergmm(net~ euclidean(d=latent.dim))
+        net <- network::network(data$network[[model.network.var[i]]])
+        lsm.fit <- c(lsm.fit, latentnet::ergmm(net ~ euclidean(d=latent.dim)))
       }
 
       distsum <- 0
@@ -197,7 +192,6 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
         distsum = distsum + outer(lsm.fit$mcmc.mle$Z[,dimind], lsm.fit$mcmc.mle$Z[,dimind], "-")^2
       }
       dists <- array(t(sqrt(distsum)))
-
 
       data_edge[paste0(model.network.var[i], ".dists")] <- dists
       latent.vars[[model.network.var[i]]] <- c(paste0(model.network.var[i], ".dists"))
@@ -222,6 +216,7 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
 
   ## get the use specified model information
   model.user <- model.lavaanify[model.lavaanify$user==1, ]
+
 
   ## now process each part of the user specified model
   model.to.remove.index <- NULL
@@ -260,10 +255,14 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, network=NULL, type="differen
 
   model.remove.network.var <- model.user[-model.to.remove.index, ]
   model.non.network.var <- ""
-  for (i in 1:nrow(model.remove.network.var)){
-    model.non.network.var.temp <- paste0(paste0(model.remove.network.var[i, c('lhs', 'op', 'rhs')], collapse = ' '))
-    model.non.network.var <- paste0(model.non.network.var.temp, "\n", model.non.network.var)
+  if (nrow(model.remove.network.var)>0){
+    for (i in 1:nrow(model.remove.network.var)){
+      model.non.network.var.temp <- paste0(paste0(model.remove.network.var[i, c('lhs', 'op', 'rhs')], collapse = ' '))
+      model.non.network.var <- paste0(model.non.network.var.temp, "\n", model.non.network.var)
+    }
   }
+
+
 
   model.full <- paste0(model.non.network.var, "\n", model.to.add)
 

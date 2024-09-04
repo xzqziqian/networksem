@@ -7,7 +7,6 @@
 sem.net.edge(
   model = NULL,
   data = NULL,
-  network = NULL,
   type = "difference",
   ordered = NULL,
   sampling.weights = NULL,
@@ -22,9 +21,7 @@ sem.net.edge(
 \arguments{
 \item{model}{a model specified in lavaan model syntax.}
 
-\item{data}{a data frame containing the observed non-network nodal variables}
-
-\item{network}{a named list of networks that will be used in the SEM}
+\item{data}{a list containing both the non-network and network data}
 
 \item{type}{"difference" for using the difference between the network statistics of the two actors as the edge covariate; "average" for using the average of the network statistics of the two actors as the edge covariate}
 

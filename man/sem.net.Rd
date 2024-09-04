@@ -7,7 +7,6 @@
 sem.net(
   model = NULL,
   data = NULL,
-  network = NULL,
   netstats = NULL,
   ordered = NULL,
   sampling.weights = NULL,
@@ -24,9 +23,7 @@ sem.net(
 \arguments{
 \item{model}{a model specified in lavaan model syntax.}
 
-\item{data}{a data frame containing the observed non-network nodal variables}
-
-\item{network}{a named list of networks that will be used in the SEM}
+\item{data}{a list containing the observed non-network nodal variables and the network data}
 
 \item{netstats}{a user-specified list of network statistics to be calculated and used in the SEM, e.g., c("degree", "betweenness"), available options include "degree", "betweenness", "closeness", "evcent", "stresscent", and "infocent" from the "sna" package and "ivi", "hubness.score", "spreading.score" and "clusterRank" from the "influential" package}
 

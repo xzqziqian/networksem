@@ -7,7 +7,6 @@
 sem.net.addvar.influential(
   model.network.stat.var.list,
   data,
-  network,
   model.network.var.i,
   stats,
   statsname,
@@ -18,9 +17,7 @@ sem.net.addvar.influential(
 \arguments{
 \item{model.network.stat.var.list}{a list of elements with names corresponding to the network names and values corresponding to lists of network statistics that will be calculated for the corresponding network}
 
-\item{data}{a data frame containing the observed non-network nodal variables}
-
-\item{network}{a named list of networks that will be used in the SEM}
+\item{data}{a list containing both the non-network and network data}
 
 \item{model.network.var.i}{an index indicating a specific network within all networks}
 

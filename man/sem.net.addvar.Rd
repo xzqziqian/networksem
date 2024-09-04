@@ -7,7 +7,6 @@
 sem.net.addvar(
   model.network.stat.var.list = NULL,
   data = NULL,
-  network,
   netstats = NULL,
   model.network.var.i = NULL,
   netstats.rescale = TRUE,
@@ -17,9 +16,7 @@ sem.net.addvar(
 \arguments{
 \item{model.network.stat.var.list}{a list of elements with names corresponding to the network names and values corresponding to lists of network statistics that will be calculated for the corresponding network}
 
-\item{data}{a data frame}
-
-\item{network}{a list of networks}
+\item{data}{a list containing both the non-network and network data}
 
 \item{netstats}{a list of user-specified network statistics}
 

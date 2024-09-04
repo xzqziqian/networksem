@@ -2,12 +2,11 @@
 % Please edit documentation in R/networkFun.R
 \name{sem.net.addvar.stat}
 \alias{sem.net.addvar.stat}
-\title{Compute a list of user-specified network statistics values using the "sna" package and add them to the existing data.}
+\title{Compute a list of user-specified network statistics values using the "sna" package and add them to the non-network data.}
 \usage{
 sem.net.addvar.stat(
   model.network.stat.var.list,
   data,
-  network,
   model.network.var.i,
   stats,
   statsname,
@@ -18,9 +17,7 @@ sem.net.addvar.stat(
 \arguments{
 \item{model.network.stat.var.list}{a list of elements with names corresponding to the network names and values corresponding to lists of network statistics that will be calculated for the corresponding network}
 
-\item{data}{a data frame containing the observed non-network nodal variables}
-
-\item{network}{a named list of networks that will be used in the SEM}
+\item{data}{a list containing both the non-network and network data}
 
 \item{model.network.var.i}{an index indicating a specific network within all networks}
 
@@ -36,5 +33,5 @@ sem.net.addvar.stat(
 a list with the first value being the list of network statistics names and the second value being the data frame with added network statistics
 }
 \description{
-Compute a list of user-specified network statistics values using the "sna" package and add them to the existing data.
+Compute a list of user-specified network statistics values using the "sna" package and add them to the non-network data.
 }
