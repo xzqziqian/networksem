@@ -70,11 +70,12 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
 
 
   ## estimate network latent positions
-  lsm.fit <- list()
+
+  lsm.fits <- list()
   for (i in 1:length(model.network.var)){
     if (paste0("lp.", model.network.var[i]) %in% lat.var.pred.net[[model.network.var[i]]]){
       fit <- latentnet::ergmm(network::network(data$network[[model.network.var[i]]]) ~ euclidean(d = latent.dim))
-      lsm.fit <- c(lsm.fit, fit)
+      lsm.fits[[i]] <-fit
       latent.vars[[model.network.var[i]]] <- c()
       for (dimind in 1:latent.dim){
         data$nonnetwork[paste0(model.network.var[i], ".Z", dimind)] <- fit$mcmc.mle$Z[,dimind]
@@ -160,7 +161,7 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
   model.res <- do.call(what="sem", args=c(lavparams))
 
 
-  list(model=model.full, estimates=list(sem.es=model.res,lsm.es=lsm.fit), data=data)
+  list(model=model.full, estimates=list(sem.es=model.res,lsm.es=lsm.fits), data=data)
 }
 
 

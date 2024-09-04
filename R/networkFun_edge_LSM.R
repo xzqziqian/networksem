@@ -70,7 +70,7 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
 
 
   latent.vars <- list()
-  lsm.fit <- list()
+  lsm.fits <- list()
   fit.prev <- NULL
   cov.mani <- list()
   edgeatt<-list()
@@ -176,7 +176,8 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
 
         formu_parsed <- parse(text=formu)
         assign("net",net,envir = globalenv())
-        lsm.fit <- c(lsm.fit, eval(formu_parsed))
+        lsm.fit <- eval(formu_parsed)
+        lsm.fits[[i]] <- lsm.fit
 
 
 
@@ -184,7 +185,8 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
 
       }else{
         net <- network::network(data$network[[model.network.var[i]]])
-        lsm.fit <- c(lsm.fit, latentnet::ergmm(net ~ euclidean(d=latent.dim)))
+        lsm.fit <- latentnet::ergmm(net ~ euclidean(d=latent.dim))
+        lsm.fit[[i]] <- lsm.fit
       }
 
       distsum <- 0
@@ -300,5 +302,5 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
   model.res <- do.call(what="sem", args=c(lavparams))
 
 
-  list(model=model.full, estimates=list(sem.es=model.res,lsm.es=lsm.fit), data = data_edge)
+  list(model=model.full, estimates=list(sem.es=model.res,lsm.es=lsm.fits), data = data_edge)
 }
