@@ -73,7 +73,7 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
   lsm.fits <- list()
   fit.prev <- NULL
   cov.mani <- list()
-  edgeatt<-list()
+  edgeatt <- list()
 
   model.lavaanify <- lavaan::lavaanify(model)
 
@@ -126,6 +126,7 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
 
   # find cov in LSM, fit LSM with cov model
   for (i in 1:length(model.network.var)){
+
     if (paste0("lp.", model.network.var[i]) %in% lat.var.pred.net[[model.network.var[i]]]){
       # filter out the covariates
       lat.var.pred.net.cov <- lat.var.pred.net[[model.network.var[i]]][!grepl("lp.", lat.var.pred.net[[model.network.var[i]]], fixed = TRUE)]
@@ -186,7 +187,7 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
       }else{
         net <- network::network(data$network[[model.network.var[i]]])
         lsm.fit <- latentnet::ergmm(net ~ euclidean(d=latent.dim))
-        lsm.fit[[i]] <- lsm.fit
+        lsm.fits[[i]] <- lsm.fit
       }
 
       distsum <- 0
