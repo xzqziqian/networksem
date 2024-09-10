@@ -10,6 +10,7 @@ sem.net.lsm(
   latent.dim = 2,
   ordered = NULL,
   sampling.weights = NULL,
+  data.rescale = FALSE,
   netstats.rescale = TRUE,
   group = NULL,
   cluster = NULL,
@@ -31,7 +32,9 @@ sem.net.lsm(
 
 \item{sampling.weights}{parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data}
 
-\item{netstats.rescale}{a list of logical value indicating whether to rescale network statistics to have mean 0 and sd 1.}
+\item{data.rescale}{whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE}
+
+\item{netstats.rescale}{a list of logical value indicating whether to rescale network statistics to have mean 0 and sd 1}
 
 \item{group}{parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model}
 

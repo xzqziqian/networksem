@@ -10,6 +10,7 @@ sem.net.edge(
   type = "difference",
   ordered = NULL,
   sampling.weights = NULL,
+  data.rescale = FALSE,
   group = NULL,
   cluster = NULL,
   constraints = "",
@@ -28,6 +29,8 @@ sem.net.edge(
 \item{ordered}{parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal}
 
 \item{sampling.weights}{parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data}
+
+\item{data.rescale}{whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE}
 
 \item{group}{parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model}
 

@@ -9,6 +9,7 @@ sem.net.edge.lsm(
   data = NULL,
   type = "difference",
   latent.dim = 2,
+  data.rescale = FALSE,
   ordered = NULL,
   sampling.weights = NULL,
   group = NULL,
@@ -27,6 +28,8 @@ sem.net.edge.lsm(
 \item{type}{"difference" for using the difference between the network statistics of the two actors as the edge covariate; "average" for using the average of the network statistics of the two actors as the edge covariate}
 
 \item{latent.dim}{number of network latent dimensions to use}
+
+\item{data.rescale}{whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE}
 
 \item{ordered}{parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal}
 

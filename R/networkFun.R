@@ -6,7 +6,7 @@
 #' @param model.network.stat.var.list a list of elements with names corresponding to the network names and values corresponding to lists of network statistics that will be calculated for the corresponding network
 #' @param model.network.var.i an index indicating a specific network within all networks
 #' @param stats a network statistics that can be calculated using package "sna"
-#'@param statsname name of the network statistics
+#' @param statsname name of the network statistics
 #' @param netstats.rescale a logical value indicating whether to rescale network statistics to have mean 0 and sd 1
 #' @param netstats.options a list with names being the argument names for calculating the network statistics, and values being the argument values
 #' @return a list with the first value being the list of network statistics names and the second value being the data frame with added network statistics
@@ -104,6 +104,7 @@ sem.net.addvar <- function(model.network.stat.var.list=NULL, data=NULL, netstats
 #' @param netstats a user-specified list of network statistics to be calculated and used in the SEM, e.g., c("degree", "betweenness"), available options include "degree", "betweenness", "closeness", "evcent", "stresscent", and "infocent" from the "sna" package and "ivi", "hubness.score", "spreading.score" and "clusterRank" from the "influential" package
 #' @param netstats.options a user-specified named list with element names corresponding to the network statistics names and element values corresponding to other lists. The list corresponding to each network statistics name has element names being the argument names for calculating the network statistics, and values being the argument values, as used in the corresponding functions in the "sna" or "influential" packages. e.g., netstats.options=list("degree"=list("cmode"="freeman"), "closeness"=list("cmode"="undirected"), "clusterRank"=list("directed"=FALSE))
 #' @param netstats.rescale a list of logical value indicating whether to rescale network statistics to have mean 0 and sd 1.
+#' @param data.rescale whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE
 #' @param ordered parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal
 #' @param sampling.weights parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data
 #' @param group parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model
@@ -115,8 +116,8 @@ sem.net.addvar <- function(model.network.stat.var.list=NULL, data=NULL, netstats
 #' @return the updated model specification with the network statistics as variables and a lavaan object which is the SEM results
 #' @export
 sem.net <- function(model=NULL, data=NULL, netstats=NULL,
-                    ordered = NULL, sampling.weights = NULL,
-                    netstats.rescale=TRUE, group = NULL, cluster = NULL,
+                    ordered = NULL, sampling.weights = NULL, data.rescale = FALSE,
+                    netstats.rescale = TRUE, group = NULL, cluster = NULL,
                     constraints = "", WLS.V = NULL, NACOV = NULL,
                     netstats.options=NULL, ...){
   ## checking proper input
@@ -243,6 +244,15 @@ sem.net <- function(model=NULL, data=NULL, netstats=NULL,
   for (i in 1:length(params)){
     if (names(params)[i] %in% names(lavOptions())){
       lavparams[[names(params[i])]] <- params[[i]]
+    }
+  }
+
+
+  if (data.rescale){
+    for (i in 1:ncol(data$nonnetwork)){
+      if (is.numeric(data$nonnetwork[,i])){
+        data$nonnetwork[,i] <- scale(data$nonnetwork[,i], center = TRUE, scale = TRUE)
+      }
     }
   }
 

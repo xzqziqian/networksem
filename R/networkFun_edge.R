@@ -3,6 +3,7 @@
 #' @param data a list containing both the non-network and network data
 #' @param type "difference" for using the difference between the network statistics of the two actors as the edge covariate; "average" for using the average of the network statistics of the two actors as the edge covariate
 #' @param ordered parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal
+#' @param data.rescale whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE
 #' @param sampling.weights parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data
 #' @param group parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model
 #' @param cluster parameter same as "cluster" in the lavaan sem() function; whether to fit a cluster model
@@ -13,7 +14,7 @@
 #' @return the updated model specification and a lavaan object which is the SEM results, and the data generated
 #' @export
 sem.net.edge <- function(model = NULL, data = NULL, type = "difference",
-                    ordered = NULL, sampling.weights = NULL,
+                    ordered = NULL, sampling.weights = NULL, data.rescale = FALSE,
                     group = NULL, cluster = NULL,
                     constraints = "", WLS.V = NULL, NACOV = NULL,
                     ...){
@@ -124,6 +125,14 @@ sem.net.edge <- function(model = NULL, data = NULL, type = "difference",
   for (i in 1:length(params)){
     if (names(params)[i] %in% names(lavOptions())){
       lavparams[[names(params[i])]] <- params[[i]]
+    }
+  }
+
+  if (data.rescale){
+    for (i in 1:ncol(data_edge)){
+      if (is.numeric(data_edge[,i])){
+        data_edge[,i] <- scale(data_edge[,i], center = TRUE, scale = TRUE)
+      }
     }
   }
 
