@@ -2,9 +2,7 @@
 #' Fit a sem model with network data using node latent positions and/or network statistics as variables. User-specified network statistics will be calculated and used as variables instead of the networks themselves in the SEM.
 #' @param model a model specified in lavaan model syntax.
 #' @param data a list containing both the non-network and network data
-#' @param netstats a user-specified list of network statistics to be calculated and used in the SEM, e.g., c("degree", "betweenness"), available options include "degree", "betweenness", "closeness", "evcent", "stresscent", and "infocent" from the "sna" package and "ivi", "hubness.score", "spreading.score" and "clusterRank" from the "influential" package
-#' @param netstats.options a user-specified named list with element names corresponding to the network statistics names and element values corresponding to other lists. The list corresponding to each network statistics name has element names being the argument names for calculating the network statistics, and values being the argument values, as used in the corresponding functions in the "sna" or "influential" packages. e.g., netstats.options=list("degree"=list("cmode"="freeman"), "closeness"=list("cmode"="undirected"), "clusterRank"=list("directed"=FALSE))
-#' @param netstats.rescale a list of logical value indicating whether to rescale network statistics to have mean 0 and sd 1
+#' @param netstats.rescale a logical value indicating whether to rescale network statistics or variables to have mean 0 and sd 1
 #' @param data.rescale whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE
 #' @param ordered parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal
 #' @param sampling.weights parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data
@@ -19,7 +17,7 @@
 #' @export
 sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
                     ordered = NULL, sampling.weights = NULL, data.rescale=FALSE,
-                    netstats.rescale=TRUE, group = NULL, cluster = NULL,
+                    netstats.rescale=FALSE, group = NULL, cluster = NULL,
                     constraints = "", WLS.V = NULL, NACOV = NULL,
                     netstats.options=NULL, ...){
   ## checking proper input
@@ -80,6 +78,9 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
       latent.vars[[model.network.var[i]]] <- c()
       for (dimind in 1:latent.dim){
         data$nonnetwork[paste0(model.network.var[i], ".Z", dimind)] <- fit$mcmc.mle$Z[,dimind]
+        if (netstats.rescale){
+          data$nonnetwork[paste0(model.network.var[i], ".Z", dimind)] <- scale(fit$mcmc.mle$Z[,dimind], center = TRUE, scale = TRUE)
+        }
         latent.vars[[model.network.var[i]]] <- c(latent.vars[[model.network.var[i]]], paste0(model.network.var[i], ".Z", dimind))
       }
     }

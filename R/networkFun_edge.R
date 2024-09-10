@@ -4,6 +4,7 @@
 #' @param type "difference" for using the difference between the network statistics of the two actors as the edge covariate; "average" for using the average of the network statistics of the two actors as the edge covariate
 #' @param ordered parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal
 #' @param data.rescale whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE
+#' @param netstats.rescale a logical value indicating whether to rescale network statistics or variables to have mean 0 and sd 1
 #' @param sampling.weights parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data
 #' @param group parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model
 #' @param cluster parameter same as "cluster" in the lavaan sem() function; whether to fit a cluster model
@@ -15,7 +16,7 @@
 #' @export
 sem.net.edge <- function(model = NULL, data = NULL, type = "difference",
                     ordered = NULL, sampling.weights = NULL, data.rescale = FALSE,
-                    group = NULL, cluster = NULL,
+                    group = NULL, cluster = NULL, netstats.rescale = FALSE,
                     constraints = "", WLS.V = NULL, NACOV = NULL,
                     ...){
   ## checking proper input
@@ -59,11 +60,18 @@ sem.net.edge <- function(model = NULL, data = NULL, type = "difference",
           data_edge[j+(i-1)*nrow(data$nonnetwork), "col_actor"]=j
           for (netind in 1:length(model.network.var)){
             data_edge[j+(i-1)*nrow(data$nonnetwork), model.network.var[netind]]=network[[netind]][i,j]
+
           }
         }
       }
-
   }
+
+  if(netstats.rescale){
+    for (netind in 1:length(model.network.var)){
+      data_edge[model.network.var[netind]]=scale(data_edge[model.network.var[netind]], center=TRUE, scale=TRUE)
+    }
+  }
+
 
 
   #print(model.network.stat.var.list)

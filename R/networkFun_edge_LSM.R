@@ -5,6 +5,7 @@
 #' @param ordered parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal
 #' @param sampling.weights parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data
 #' @param data.rescale whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE
+#' @param netstats.rescale a logical value indicating whether to rescale network statistics or variables to have mean 0 and sd 1
 #' @param group parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model
 #' @param cluster parameter same as "cluster" in the lavaan sem() function; whether to fit a cluster model
 #' @param constraints parameter same as "constraints" in the lavaan sem() function; whether to apply constraints to the model
@@ -17,7 +18,7 @@
 sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
                              latent.dim = 2, data.rescale = FALSE,
                     ordered = NULL, sampling.weights = NULL,
-                    group = NULL, cluster = NULL,
+                    group = NULL, cluster = NULL, netstats.rescale = FALSE,
                     constraints = "", WLS.V = NULL, NACOV = NULL,
                     ...){
   ## checking proper input
@@ -198,6 +199,9 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
       dists <- array(t(sqrt(distsum)))
 
       data_edge[paste0(model.network.var[i], ".dists")] <- dists
+      if (netstats.rescale){
+        data_edge[paste0(model.network.var[i], ".dists")] <- scale(dists, center = TRUE, scale = TRUE)
+      }
       latent.vars[[model.network.var[i]]] <- c(paste0(model.network.var[i], ".dists"))
     }
   }

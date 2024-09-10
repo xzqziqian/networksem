@@ -117,7 +117,7 @@ sem.net.addvar <- function(model.network.stat.var.list=NULL, data=NULL, netstats
 #' @export
 sem.net <- function(model=NULL, data=NULL, netstats=NULL,
                     ordered = NULL, sampling.weights = NULL, data.rescale = FALSE,
-                    netstats.rescale = TRUE, group = NULL, cluster = NULL,
+                    netstats.rescale = FALSE, group = NULL, cluster = NULL,
                     constraints = "", WLS.V = NULL, NACOV = NULL,
                     netstats.options=NULL, ...){
   ## checking proper input
