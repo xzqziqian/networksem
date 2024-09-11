@@ -11,7 +11,7 @@ sem.net.lsm(
   ordered = NULL,
   sampling.weights = NULL,
   data.rescale = FALSE,
-  netstats.rescale = TRUE,
+  netstats.rescale = FALSE,
   group = NULL,
   cluster = NULL,
   constraints = "",
@@ -34,7 +34,7 @@ sem.net.lsm(
 
 \item{data.rescale}{whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE}
 
-\item{netstats.rescale}{a list of logical value indicating whether to rescale network statistics to have mean 0 and sd 1}
+\item{netstats.rescale}{a logical value indicating whether to rescale network statistics or variables to have mean 0 and sd 1}
 
 \item{group}{parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model}
 
@@ -46,11 +46,7 @@ sem.net.lsm(
 
 \item{NACOV}{parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator}
 
-\item{netstats.options}{a user-specified named list with element names corresponding to the network statistics names and element values corresponding to other lists. The list corresponding to each network statistics name has element names being the argument names for calculating the network statistics, and values being the argument values, as used in the corresponding functions in the "sna" or "influential" packages. e.g., netstats.options=list("degree"=list("cmode"="freeman"), "closeness"=list("cmode"="undirected"), "clusterRank"=list("directed"=FALSE))}
-
 \item{...}{optional arguments for the sem() function}
-
-\item{netstats}{a user-specified list of network statistics to be calculated and used in the SEM, e.g., c("degree", "betweenness"), available options include "degree", "betweenness", "closeness", "evcent", "stresscent", and "infocent" from the "sna" package and "ivi", "hubness.score", "spreading.score" and "clusterRank" from the "influential" package}
 }
 \value{
 the updated model specification with the network statistics as variables and a lavaan object which is the SEM results

@@ -11,7 +11,7 @@ sem.net(
   ordered = NULL,
   sampling.weights = NULL,
   data.rescale = FALSE,
-  netstats.rescale = TRUE,
+  netstats.rescale = FALSE,
   group = NULL,
   cluster = NULL,
   constraints = "",

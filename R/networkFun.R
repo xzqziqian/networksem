@@ -269,7 +269,9 @@ sem.net <- function(model=NULL, data=NULL, netstats=NULL,
   model.res <- do.call(what="sem", args=c(lavparams))
 
 
-  list(model=model.full, estimates=model.res, data=data)
+  obj <- list(model=model.full, estimates=model.res, data=data)
+  class(obj) <- "networksem"
+  return(obj)
 }
 
 

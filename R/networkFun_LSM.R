@@ -171,7 +171,9 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
   model.res <- do.call(what="sem", args=c(lavparams))
 
 
-  list(model=model.full, estimates=list(sem.es=model.res,lsm.es=lsm.fits), data=data)
+  obj <- list(model=model.full, estimates=list(sem.es=model.res,lsm.es=lsm.fits), data=data)
+  class(obj) <- "networksem"
+  return(obj)
 }
 
 

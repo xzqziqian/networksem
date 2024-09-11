@@ -1,6 +1,6 @@
-Package: BigSEM
+Package: networksem
 Type: Package
-Title: SEM with network and text data
+Title: SEM with network data
 Version: 0.1.0
 Authors@R: 
   c(person(given = "Zhiyong",
@@ -10,15 +10,12 @@ Authors@R:
            comment = c(ORCID = "0000-0003-0590-2196")),
     person(given = "Ziqian",
            family = "Xu",
-           role = c("aut")),
-    person(given = "Lingbo",
-           family = "Tong",
            role = c("aut")))
 Maintainer: Zhiyong Zhang <johnnyzhz@gmail.com>
-Description: Allows the estimation of SEM with network and text data.
-Depends: sna, igraph, influential, lavaan, latentnet, ergm, network, sentimentr, lexicon
+Description: Performs the estimation of SEM with networkdata.
+Depends: sna, igraph, influential, lavaan, latentnet, ergm, network
 License: GPL
-Imports: sna, igraph, influential, lavaan, latentnet, ergm, network, sentimentr, lexicon
+Imports: sna, igraph, influential, lavaan, latentnet, ergm, network
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.2

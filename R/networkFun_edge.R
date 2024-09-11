@@ -157,5 +157,7 @@ sem.net.edge <- function(model = NULL, data = NULL, type = "difference",
   model.res <- do.call(what="sem", args=c(lavparams))
 
 
-  list(model=model, estimates=model.res, data=data_edge)
+  obj <- list(model=model, estimates=model.res, data=data_edge)
+  class(obj) <- "networksem"
+  return(obj)
 }

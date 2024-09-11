@@ -14,6 +14,7 @@ sem.net.edge.lsm(
   sampling.weights = NULL,
   group = NULL,
   cluster = NULL,
+  netstats.rescale = FALSE,
   constraints = "",
   WLS.V = NULL,
   NACOV = NULL,
@@ -38,6 +39,8 @@ sem.net.edge.lsm(
 \item{group}{parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model}
 
 \item{cluster}{parameter same as "cluster" in the lavaan sem() function; whether to fit a cluster model}
+
+\item{netstats.rescale}{a logical value indicating whether to rescale network statistics or variables to have mean 0 and sd 1}
 
 \item{constraints}{parameter same as "constraints" in the lavaan sem() function; whether to apply constraints to the model}
 
