@@ -1,0 +1,382 @@
+---
+title: "Structural Equation Models with Networks"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Todos:
+- Write a new summary function
+- scaling
+
+
+packages
+ 
+```{r message=FALSE, warning=FALSE}
+# packages
+library(lavaan) #for SEM
+library(influential) #for social networks
+library(sna) #for social networks
+library(networksem)
+library(knitr)
+library(DiagrammeR)
+```
+ 
+
+## Using actor-based network statistics within SEM
+
+
+```{r}
+# load data
+load("data/cf_data_book.RData")  ## load the list cf_data 
+
+## data - non-network variables
+non_network <- as.data.frame(cf_data$cf_nodal_cov)
+dim(non_network)
+
+## network - network variables (friends network and wechat network)
+## note that the names of the networks are used in model specification
+network <- list()
+network$friends <- cf_data$cf_friend_network
+network$wechat <- cf_data$cf_wetchat_network
+
+
+model <-'
+  Extroversion =~ personality1 + personality6
+                + personality11 + personality16
+  Conscientiousness =~ personality2 + personality7
+                + personality12 + personality17
+  Neuroticism  =~ personality3 + personality8
+                + personality13 + personality18
+  Openness =~ personality4 + personality9
+                + personality14 + personality19
+  Agreeableness =~ personality5 + personality10 +
+                personality15 + personality20
+  Happiness =~ happy1 + happy2 + happy3 + happy4
+  friends ~ Extroversion + Conscientiousness + Neuroticism + 
+  Openness + Agreeableness
+  Happiness ~ friends + wechat 
+'
+
+## run sem.net
+data = list(
+  nonnetwork = non_network,
+  network = network
+)
+
+set.seed(100)
+res <- sem.net(model=model, data=data, 
+               netstats=c("degree", "betweenness", "closeness"),
+               netstats.rescale = T,
+               netstats.options=list("degree"=list("cmode"="freeman"))) 
+
+
+## the actual data used for model
+str(res$data)
+
+mean(res$data$nonnetwork$wechat.degree)
+
+## results
+summary(res)
+
+## calculate mediation effect
+pars <- parameterEstimates(res$estimates)
+predictor = c("Extroversion")
+mediator = c("friends.degree", "friends.betweenness", "friends.closeness")
+outcome = c("Happiness")
+effect_table <- expand.grid("predictor" = predictor, 
+                            "mediator" = mediator, 
+                            "outcome" = outcome)
+effect_table$apath = NA; effect_table$bpath = NA; effect_table$indirect = NA
+effect_table$apath_se = NA; effect_table$bpath_se = NA;
+for (i in 1:nrow(effect_table)){
+  effect_table$apath[i] <- pars[pars$rhs == effect_table$predictor[i] & pars$lhs == effect_table$mediator[i], "est"]
+  effect_table$apath_se[i] <- pars[pars$rhs == effect_table$predictor[i] & pars$lhs == effect_table$mediator[i], "se"]
+  effect_table$bpath[i] <- pars[pars$rhs == effect_table$mediator[i] & pars$lhs == effect_table$outcome[i], "est"]
+  effect_table$bpath_se[i] <- pars[pars$rhs == effect_table$mediator[i] & pars$lhs == effect_table$outcome[i], "se"]
+  effect_table$indirect[i] <- effect_table$apath[i]*effect_table$bpath[i]
+}
+
+effect_table
+
+
+# extract loadings etc
+
+vals <- lavInspect(res$estimates, what="est")
+# factor loadings
+# kable(round(vals$lambda,2)[,1:6], booktab=T, format = "latex")
+# error covariance
+# vals$theta
+# regression coefficients
+# vals$beta
+# observed variable covariance
+# vals$psi
+
+
+plot.res <- lavaan2ram(res$estimates, ram.out = F)
+plot.res.path <- ramPathBridge(plot.res, F, F)
+plot(plot.res.path, 'ex1', output.type='dot')
+
+grViz('ex1.dot')
+
+## Wald statistics for two loadings
+W <- coef(res$estimates)[2:3] %*% solve(vcov(res$estimates)[2:3, 2:3]) %*% coef(res$estimates)[2:3]
+
+## p-value
+1 - pnorm(W, lower.tail = F)*2
+```
+
+## Using actor-based latent positions in SEM
+
+```{r}
+# load data
+load("data/cf_data_book.RData")  ## load the list cf_data 
+
+## data - non-network variables
+non_network <- as.data.frame(cf_data$cf_nodal_cov)
+dim(non_network)
+
+## network - network variables (friends network and wechat network)
+## note that the names of the networks are used in model specification
+network <- list()
+network$friends <- cf_data$cf_friend_network
+network$wechat <- cf_data$cf_wetchat_network
+network$wechat[is.na(network$wechat)] <- 0
+
+
+model <-'
+  Extroversion =~ personality1 + personality6
+                + personality11 + personality16
+  Conscientiousness =~ personality2 + personality7
+                + personality12 + personality17
+  Neuroticism  =~ personality3 + personality8
+                + personality13 + personality18
+  Openness =~ personality4 + personality9
+                + personality14 + personality19
+  Agreeableness =~ personality5 + personality10 +
+                personality15 + personality20
+  Happiness =~ happy1 + happy2 + happy3 + happy4
+  friends ~ lp.friends
+  wechat ~ lp.wechat
+  lp.friends ~ Extroversion + Conscientiousness + Neuroticism + 
+  Openness + Agreeableness
+  Happiness ~ lp.friends + lp.wechat 
+'
+
+
+data = list(network=network, nonnetwork=non_network)
+set.seed(100)
+res <- sem.net.lsm(model=model,data=data, latent.dim = 2, data.rescale = T)
+
+
+### write a new summary function
+## results
+summary(res)
+plot(res$estimates$lsm.es[[1]])
+plot(res$estimates$lsm.es[[2]])
+str(res$data)
+
+## calculate mediation effect
+pars <- parameterEstimates(res$estimates$sem.es)
+predictor = c("Extroversion")
+mediator = c("friends.Z1", "friends.Z2")
+outcome = c("Happiness")
+effect_table <- expand.grid("predictor" = predictor, 
+                            "mediator" = mediator, 
+                            "outcome" = outcome)
+effect_table$apath = NA; effect_table$bpath = NA; effect_table$indirect = NA
+effect_table$apath_se = NA; effect_table$bpath_se = NA;
+for (i in 1:nrow(effect_table)){
+  effect_table$apath[i] <- pars[pars$rhs == effect_table$predictor[i] & pars$lhs == effect_table$mediator[i], "est"]
+  effect_table$apath_se[i] <- pars[pars$rhs == effect_table$predictor[i] & pars$lhs == effect_table$mediator[i], "se"]
+  effect_table$bpath[i] <- pars[pars$rhs == effect_table$mediator[i] & pars$lhs == effect_table$outcome[i], "est"]
+  effect_table$bpath_se[i] <- pars[pars$rhs == effect_table$mediator[i] & pars$lhs == effect_table$outcome[i], "se"]
+  effect_table$indirect[i] <- effect_table$apath[i]*effect_table$bpath[i]
+}
+
+effect_table
+```
+
+
+## Using edge values in SEM
+
+attorney dataset
+
+```{r}
+
+non_network <- read.table("data/attorney/ELattr.dat")[,c(3,5)]
+colnames(non_network) <- c('gender', 'years')
+non_network$gender <- non_network$gender - 1
+network <- list()
+network$advice <- read.table("data/attorney/ELadv.dat")
+network$cowork <- read.table("data/attorney/ELwork.dat")
+
+  
+model <-'
+  advice ~ gender + years
+  cowork ~ advice + gender + years
+'
+
+data = list(network=network, nonnetwork=non_network)
+set.seed(100)
+res <- sem.net.edge(model = model, data = data, data.rescale = F, netstats.rescale = T,
+                    network = network, type = "difference", ordered = c("cowork", "advice")) 
+
+str(res$data)
+## results
+summary(res)
+```
+
+friendship dataset
+
+```{r}
+# load data
+load("data/cf_data_book.RData")  ## load the list cf_data 
+
+## data - non-network variables
+non_network <- as.data.frame(cf_data$cf_nodal_cov)
+dim(non_network)
+
+## network - network variables (friends network and wechat network)
+## note that the names of the networks are used in model specification
+network <- list()
+network$friends <- cf_data$cf_friend_network
+network$wechat <- cf_data$cf_wetchat_network
+network$wechat[is.na(network$wechat)] <- 0
+
+model <-'
+  Extroversion =~ personality1 + personality6
+                + personality11 + personality16
+  Conscientiousness =~ personality2 + personality7
+                + personality12 + personality17
+  Neuroticism  =~ personality3 + personality8
+                + personality13 + personality18
+  Openness =~ personality4 + personality9
+                + personality14 + personality19
+  Agreeableness =~ personality5 + personality10 +
+                personality15 + personality20
+  Happiness =~ happy1 + happy2 + happy3 + happy4
+  friends ~ a1*Extroversion + a2*Conscientiousness + a3*Neuroticism + 
+  a4*Openness + a5*Agreeableness
+  Happiness ~ b1*friends + b2*wechat 
+'
+
+
+data = list(network=network, nonnetwork=non_network)
+set.seed(100)
+res <- sem.net.edge(model=model,data=data, type = 'difference', ordered = 'friends', nestats.rescale = T)
+
+## results
+summary(res)
+```
+
+## Using latent distance in SEM
+
+attorney (errorL: loops in data)
+
+```{r}
+# on_network <- read.table("data/attorney/ELattr.dat")[,c(3,5)]
+# colnames(non_network) <- c('gender', 'years')
+# non_network$gender <- non_network$gender - 1
+# network <- list()
+# network$advice <- read.table("data/attorney/ELadv.dat")
+# network$cowork <- read.table("data/attorney/ELwork.dat")
+# 
+# for (i in 1:nrow(network$advice)){
+#   network$advice[i, i] <- 0
+# }
+# net <- network::network(network$advice)
+# latentnet::ergmm(net ~ euclidean(d=latent.dim))
+# 
+# 
+# model <-'
+#   advice ~ lp.advice
+#   lp.advice ~ gender + years 
+# '
+# 
+# data = list(nonnetwork = non_network, network = network)
+# res <- sem.net.edge.lsm(model = model,data = data, latent.dim = 2, type = 'difference', data.rescale = T) 
+# 
+# str(res$data)
+# summary(res$estimates$sem.es, fit=TRUE)
+# summary(res$estimates$lsm.es[[1]], fit=TRUE)
+```
+
+friendship data
+
+```{r}
+# load data
+load("data/cf_data_book.RData")  ## load the list cf_data 
+
+## data - non-network variables
+non_network <- as.data.frame(cf_data$cf_nodal_cov)
+dim(non_network)
+
+## network - network variables (friends network and wechat network)
+## note that the names of the networks are used in model specification
+network <- list()
+network$friends <- cf_data$cf_friend_network
+network$wechat <- cf_data$cf_wetchat_network
+network$wechat[is.na(network$wechat)] <- 0
+
+
+model <-'
+  Extroversion =~ personality1 + personality6
+                + personality11 + personality16
+  Conscientiousness =~ personality2 + personality7
+                + personality12 + personality17
+  Neuroticism  =~ personality3 + personality8
+                + personality13 + personality18
+  Openness =~ personality4 + personality9
+                + personality14 + personality19
+  Agreeableness =~ personality5 + personality10 +
+                personality15 + personality20
+  Happiness =~ happy1 + happy2 + happy3 + happy4
+  friends ~ lp.friends
+  wechat ~ lp.wechat
+  lp.friends ~ a1*Extroversion + a2*Conscientiousness + a3*Neuroticism + 
+  a4*Openness + a5*Agreeableness
+  Happiness ~ b1*lp.friends + b2*lp.wechat 
+'
+
+
+data = list(network=network, nonnetwork=non_network)
+res <- sem.net.edge.lsm(model=model,data=data, latent.dim = 2, netstats.rescale = T)
+
+
+## results
+summary(res)
+str(res$data)
+
+```
+
+marriage
+
+```{r}
+load("data/flomarriage.RData")
+
+network <- list()
+network$flo <- flomarriage.network
+nonnetwork <- flomarriage.nonnetwork
+
+
+model <- '
+  flo ~ lp.flo + wealth
+  lp.flo ~  priorates
+'
+
+data = list(network=network, nonnetwork=nonnetwork)
+set.seed(100)
+res <- sem.net.edge.lsm(model=model,data=data, type = "difference", latent.dim = 2, netstats.rescale = T) 
+## results
+summary(res)
+str(res$data)
+
+plot(res$estimates$lsm.es[[1]], pie=T)
+summary(res)
+```
+
