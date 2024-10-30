@@ -1,7 +1,7 @@
 
 
 ############ simulated data
-set.seed(100)
+set.seed(10)
 nsamp = 50
 net <- ifelse(matrix(rnorm(nsamp^2), nsamp, nsamp) > 1, 1, 0)
 mean(net) # density of simulated network
