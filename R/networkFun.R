@@ -193,6 +193,7 @@ sem.net <- function(model=NULL, data=NULL, netstats=NULL,
         model.to.add <- paste0(model.to.add, model.temp)
       }
     }
+
     ## check if the variable on the rhs is a network variable and the lhs is not
     if (model.user$rhs[i] %in% model.network.var  && (!(model.user$lhs[i] %in% model.network.var))){
       ## record the index i and create new model items

@@ -144,6 +144,7 @@ sem.net.edge <- function(model = NULL, data = NULL, type = "difference",
     }
   }
 
+
   lavparams[["data"]] <- data_edge
   lavparams[["model"]] <- model
   lavparams[["ordered"]] <- ordered

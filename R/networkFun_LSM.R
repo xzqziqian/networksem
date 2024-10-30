@@ -42,6 +42,7 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
   if (!is.null(data$network)){
     data.network.var <- names(data$network)
   }
+  latent.network = data.network.var
 
   ## find the network variables in the model
   model.network.var <- data.network.var[data.network.var %in% model.var]
@@ -55,41 +56,27 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
   ## get the use specified model information
   model.user <- model.lavaanify[model.lavaanify$user==1, ]
 
-  ## record nonnetwork predictors of networks that need to have latent position estimated
-  lat.var.pred.net <- list()
-  for (i in 1:nrow(model.user)){
-    if ((model.user$lhs[i] %in% model.network.var) && !(model.user$rhs[i] %in% model.network.var)){
-      if (is.null(lat.var.pred.net[[model.user$lhs[i]]])){
-        lat.var.pred.net[[model.user$lhs[i]]] <- c(model.user$rhs[i])
-      }else{
-        lat.var.pred.net[[model.user$lhs[i]]] <- c(model.user$rhs[i], lat.var.pred.net[[model.user$lhs[i]]])
-      }
-    }
-  }
-
 
   ## estimate network latent positions
-
   lsm.fits <- list()
-  for (i in 1:length(model.network.var)){
-    if (paste0("lp.", model.network.var[i]) %in% lat.var.pred.net[[model.network.var[i]]]){
-      fit <- latentnet::ergmm(network::network(data$network[[model.network.var[i]]]) ~ euclidean(d = latent.dim))
-      lsm.fits[[i]] <-fit
-      latent.vars[[model.network.var[i]]] <- c()
-      for (dimind in 1:latent.dim){
-        data$nonnetwork[paste0(model.network.var[i], ".Z", dimind)] <- fit$mcmc.mle$Z[,dimind]
-        if (netstats.rescale){
-          data$nonnetwork[paste0(model.network.var[i], ".Z", dimind)] <- scale(fit$mcmc.mle$Z[,dimind], center = TRUE, scale = TRUE)
-        }
-        latent.vars[[model.network.var[i]]] <- c(latent.vars[[model.network.var[i]]], paste0(model.network.var[i], ".Z", dimind))
+  for (i in 1:length(latent.network)){
+    fit <- latentnet::ergmm(network::network(data$network[[latent.network[i]]]) ~ euclidean(d = latent.dim))
+    lsm.fits[[i]] <-fit
+    latent.vars[[latent.network[i]]] <- c()
+    for (dimind in 1:latent.dim){
+      data$nonnetwork[paste0(latent.network[i], ".Z", dimind)] <- fit$mcmc.mle$Z[,dimind]
+      if (netstats.rescale){
+        data$nonnetwork[paste0(latent.network[i], ".Z", dimind)] <- scale(fit$mcmc.mle$Z[,dimind], center = TRUE, scale = TRUE)
       }
+      latent.vars[[latent.network[i]]] <- c(latent.vars[[latent.network[i]]], paste0(latent.network[i], ".Z", dimind))
     }
   }
 
+  # print(lsm.fits)
 
 
 
-  #print(model.network.stat.var.list)
+
   ## reconstruct the path model with the network variables
   ## replace the network variable name with the network variable stats name
 
@@ -100,36 +87,38 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
   model.user <- model.lavaanify[model.lavaanify$user==1, ]
 
 
-
   ## now process each part of the user specified model
   model.to.remove.index <- NULL
   model.to.add <- ""
   for (i in 1:nrow(model.user)){
-    ## check if left is network and right is latent position, remove this
-    if (model.user$lhs[i] %in% model.network.var && (grepl("lp.", model.user$rhs[i], fixed = TRUE))){
-      ## if it is, record the index i and create new model items
+    ## check if left is network with LSM, remake
+    if (model.user$lhs[i] %in% latent.network){
       model.to.remove.index <- c(model.to.remove.index, i)
-    }
-    ## check if right is latent position and left is other variables
-    if (grepl("lp.", model.user$lhs[i], fixed = TRUE) && (!(model.user$rhs[i] %in% model.network.var))){
-      ## if it is, record the index i and create new model items
-      model.to.remove.index <- c(model.to.remove.index, i)
-      model.stat.var.to.add <- latent.vars[[substring(model.user$lhs[i], 4)]]
+      model.stat.var.to.add <- latent.vars[[model.user$lhs[i]]]
       for (j in 1:length(model.stat.var.to.add)){
         model.temp <- paste0("\n ", model.stat.var.to.add[j], model.user$op[i], model.user$rhs[i])
         model.to.add <- paste0(model.to.add, model.temp)
       }
     }
-    ## left is latent position and right is others
-    if (grepl("lp.", model.user$rhs[i], fixed = TRUE) && (!(model.user$lhs[i] %in% model.network.var))){
-      ## if it is, record the index i and create new model items
+    ## check if right is network with LSM and left is other variables
+    if (model.user$rhs[i] %in% latent.network){
       model.to.remove.index <- c(model.to.remove.index, i)
-      model.stat.var.to.add <- latent.vars[[substring(model.user$rhs[i], 4)]]
+      model.stat.var.to.add <- latent.vars[[model.user$rhs[i]]]
       for (j in 1:length(model.stat.var.to.add)){
-        model.temp <- paste0("\n ", model.user$lhs[i], model.user$op[i], model.stat.var.to.add[j])
+        model.temp <- paste0("\n ",  model.user$lhs[i], model.user$op[i],  model.stat.var.to.add[j])
         model.to.add <- paste0(model.to.add, model.temp)
       }
     }
+    ## left is latent position and right is others
+    # if (grepl("lp.", model.user$rhs[i], fixed = TRUE) && (!(model.user$lhs[i] %in% model.network.var))){
+    #   ## if it is, record the index i and create new model items
+    #   model.to.remove.index <- c(model.to.remove.index, i)
+    #   model.stat.var.to.add <- latent.vars[[substring(model.user$rhs[i], 4)]]
+    #   for (j in 1:length(model.stat.var.to.add)){
+    #     model.temp <- paste0("\n ", model.user$lhs[i], model.user$op[i], model.stat.var.to.add[j])
+    #     model.to.add <- paste0(model.to.add, model.temp)
+    #   }
+    # }
   }
 
   model.remove.network.var <- model.user[-model.to.remove.index, ]

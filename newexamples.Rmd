@@ -148,6 +148,9 @@ network$wechat <- cf_data$cf_wetchat_network
 network$wechat[is.na(network$wechat)] <- 0
 
 
+
+
+
 model <-'
   Extroversion =~ personality1 + personality6
                 + personality11 + personality16
@@ -249,21 +252,26 @@ network$wechat <- cf_data$cf_wetchat_network
 network$wechat[is.na(network$wechat)] <- 0
 
 model <-'
-  Extroversion =~ personality1 + personality6
-                + personality11 + personality16
-  Conscientiousness =~ personality2 + personality7
-                + personality12 + personality17
-  Neuroticism  =~ personality3 + personality8
-                + personality13 + personality18
-  Openness =~ personality4 + personality9
-                + personality14 + personality19
-  Agreeableness =~ personality5 + personality10 +
-                personality15 + personality20
   Happiness =~ happy1 + happy2 + happy3 + happy4
-  friends ~ a1*Extroversion + a2*Conscientiousness + a3*Neuroticism + 
-  a4*Openness + a5*Agreeableness
-  Happiness ~ b1*friends + b2*wechat 
+  Happiness ~ friends
 '
+
+# model <-'
+#   Extroversion =~ personality1 + personality6
+#                 + personality11 + personality16
+#   Conscientiousness =~ personality2 + personality7
+#                 + personality12 + personality17
+#   Neuroticism  =~ personality3 + personality8
+#                 + personality13 + personality18
+#   Openness =~ personality4 + personality9
+#                 + personality14 + personality19
+#   Agreeableness =~ personality5 + personality10 +
+#                 personality15 + personality20
+#   Happiness =~ happy1 + happy2 + happy3 + happy4
+#   friends ~ a1*Extroversion + a2*Conscientiousness + a3*Neuroticism + 
+#   a4*Openness + a5*Agreeableness
+#   Happiness ~ b1*friends + b2*wechat 
+# '
 
 
 data = list(network=network, nonnetwork=non_network)

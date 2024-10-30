@@ -9,11 +9,9 @@ summary.networksem <- function(res){
     otype = "lsm"
   }
 
-
-
-  cat("The reconstructed model:\n")
-  cat(res$model)
-  cat("\n\n")
+#   cat("The reconstructed model:\n")
+#   cat(res$model)
+#   cat("\n\n")
 
 
   if (otype == "obs"){
