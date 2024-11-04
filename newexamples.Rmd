@@ -83,6 +83,8 @@ mean(res$data$nonnetwork$wechat.degree)
 ## results
 summary(res)
 
+path.networksem(res, "Extroversion", "friends.degree", "Happiness")
+
 ## calculate mediation effect
 pars <- parameterEstimates(res$estimates)
 predictor = c("Extroversion")

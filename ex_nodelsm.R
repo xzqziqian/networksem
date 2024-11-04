@@ -15,13 +15,14 @@ nonnet <- data.frame(x1 = lv1*0.5 + rnorm(nsamp),
 model <-'
   lv1 =~ x1 + x2
   lv2 =~ x3 + x4
+  net ~ lv2
   lv1 ~ net + lv2
 '
 data = list(network = list(net = net), nonnetwork = nonnet)
 set.seed(100)
 res <- sem.net.lsm(model = model, data = data, latent.dim = 2)
 summary(res)
-
+path.networksem(res, 'lv2', c('net.Z1', 'net.Z2'), 'lv1')
 
 
 

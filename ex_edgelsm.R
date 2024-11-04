@@ -16,7 +16,5 @@ set.seed(100)
 res <- sem.net.edge.lsm(model=model,data=data, type = "difference", latent.dim = 2, netstats.rescale = T, data.rescale = T)
 ## results
 summary(res)
-str(res$data)
+path.networksem(res, "wealth","flo.dists", "priorates")
 
-plot(res$estimates$lsm.es[[1]], pie=T)
-summary(res)

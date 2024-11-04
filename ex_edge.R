@@ -15,12 +15,14 @@ nonnet <- data.frame(x1 = lv1*0.5 + rnorm(nsamp),
 model <-'
   lv1 =~ x1 + x2
   lv2 =~ x3 + x4
-  lv1 ~ net + lv2
+  lv1 ~ net
+  lv2 ~ lv1
 '
 data = list(network = list(net = net), nonnetwork = nonnet)
 set.seed(100)
 res <- sem.net.edge(model = model, data = data, type = 'difference')
 summary(res)
+path.networksem(res, "net", "lv1", "lv2")
 
 ############# friendship and wechat data
 load("data/cf_data_book.RData")  ## load the list cf_data
