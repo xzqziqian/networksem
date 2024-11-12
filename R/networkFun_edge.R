@@ -59,7 +59,7 @@ sem.net.edge <- function(model = NULL, data = NULL, type = "difference",
           data_edge[j+(i-1)*nrow(data$nonnetwork), "row_actor"]=i
           data_edge[j+(i-1)*nrow(data$nonnetwork), "col_actor"]=j
           for (netind in 1:length(model.network.var)){
-            data_edge[j+(i-1)*nrow(data$nonnetwork), model.network.var[netind]]=network[[netind]][i,j]
+            data_edge[j+(i-1)*nrow(data$nonnetwork), model.network.var[netind]]=data$network[[netind]][i,j]
 
           }
         }

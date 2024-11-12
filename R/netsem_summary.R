@@ -20,10 +20,27 @@ summary.networksem <- function(res){
     print(lvsummary(res$estimates, fit = T))
   }else{
     lvsummary <- getMethod("summary",signature(object="lavaan"))
+
+    # just fit info
+    semsum <- lvsummary(res$estimates$sem.es)
+    teststats <- semsum$test$standard$stat
+    df <- semsum$test$standard$df
+    pval <- semsum$test$standard$pval
+    cat("Model Fit Information")
+    cat("SEM Test statistics: ", teststats, "on", df, "df with p-value: ", pval, "\n")
+
+
+    for (i in 1:length(res$estimates$lsm.es)){
+      lsmsum <- summary(res$estimates$lsm.es[[i]])
+      bic <- lsmsum$bic$overall
+      cat("network", i, "LSM BIC: ", bic, "\n")
+    }
+    cat("======================================== \n")
+    cat("========================================\n\n")
+
+    # full output
     cat("The SEM output:\n")
     print(lvsummary(res$estimates$sem.es, fit = T))
-
-    lvsummary <- getMethod("summary",signature(object="lavaan"))
     cat("The LSM output:\n")
     for (lsmout in res$estimates$lsm.es){
       print(summary(lsmout))

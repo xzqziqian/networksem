@@ -3,7 +3,7 @@ library(networksem)
 ############# simulated data
 set.seed(100)
 nsamp = 100
-net <- ifelse(matrix(rnorm(nsamp^2), nsamp, nsamp) > 1, 1, 0)
+net <- data.frame(ifelse(matrix(rnorm(nsamp^2), nsamp, nsamp) > 1, 1, 0))
 mean(net) # density of simulated network
 lv1 <- rnorm(nsamp)
 lv2 <- rnorm(nsamp)
@@ -26,6 +26,8 @@ path.networksem(res, "net", "lv1", "lv2")
 
 ############# friendship and wechat data
 load("data/cf_data_book.RData")  ## load the list cf_data
+write.csv(cf_data$cf_nodal_cov, "data/cf_nodal_cov.csv")
+write.csv(cf_data$cf_friend_network, "data/cf_friend_network.csv")
 
 ## data - non-network variables
 non_network <- as.data.frame(cf_data$cf_nodal_cov)
