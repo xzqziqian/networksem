@@ -22,7 +22,7 @@ data = list(network = list(net = net), nonnetwork = nonnet)
 set.seed(100)
 res <- sem.net.lsm(model = model, data = data, latent.dim = 2)
 summary(res)
-path.networksem(res, 'lv2', c('net.Z1', 'net.Z2'), 'lv1')
+path.networksem(res, 'lv2', c('net.Z1', 'net.Z2'), 'lv1') # indirect effect, can have multiple mediators.
 
 
 

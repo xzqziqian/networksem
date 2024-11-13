@@ -23,7 +23,7 @@ data = list(network = list(net = net), nonnetwork = nonnet)
 set.seed(100)
 res <- sem.net(model = model, data = data, netstats = c('degree'))
 summary(res)
-path.networksem(res, "lv2", "net.degree", "lv1")
+path.networksem(res, "lv2", c("net.degree"), "lv1")
 
 
 ################# friendship and wechat data
