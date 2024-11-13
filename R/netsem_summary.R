@@ -76,7 +76,7 @@ path.networksem <- function(res, predictor, mediator, outcome){
                               "mediator" = mediator,
                               "outcome" = outcome)
   effect_table$apath = NA; effect_table$bpath = NA; effect_table$indirect = NA;
-  effect_table$indirect_se = NA;
+  effect_table$indirect_se = NA; effect_table$indirect_z = NA;
 
 
   for (i in 1:nrow(effect_table)){
@@ -96,6 +96,7 @@ path.networksem <- function(res, predictor, mediator, outcome){
     ab_vector <- c(a, b)
     var_ab <- t(ab_vector) %*% abcov %*% ab_vector
     effect_table$indirect_se[i] <- sqrt(var_ab)
+    effect_table$indirect_z[i] <- effect_table$indirect[i]/effect_table$indirect_se[i]
 
   }
 
