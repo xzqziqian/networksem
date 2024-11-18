@@ -17,7 +17,6 @@ sem.net.lsm(
   constraints = "",
   WLS.V = NULL,
   NACOV = NULL,
-  netstats.options = NULL,
   ...
 )
 }

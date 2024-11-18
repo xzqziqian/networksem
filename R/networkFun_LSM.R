@@ -18,8 +18,7 @@
 sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
                     ordered = NULL, sampling.weights = NULL, data.rescale=FALSE,
                     netstats.rescale=FALSE, group = NULL, cluster = NULL,
-                    constraints = "", WLS.V = NULL, NACOV = NULL,
-                    netstats.options=NULL, ...){
+                    constraints = "", WLS.V = NULL, NACOV = NULL, ...){
   ## checking proper input
   if(is.null(model)){
     stop("required argument model is not specified.")
@@ -109,19 +108,12 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
         model.to.add <- paste0(model.to.add, model.temp)
       }
     }
-    ## left is latent position and right is others
-    # if (grepl("lp.", model.user$rhs[i], fixed = TRUE) && (!(model.user$lhs[i] %in% model.network.var))){
-    #   ## if it is, record the index i and create new model items
-    #   model.to.remove.index <- c(model.to.remove.index, i)
-    #   model.stat.var.to.add <- latent.vars[[substring(model.user$rhs[i], 4)]]
-    #   for (j in 1:length(model.stat.var.to.add)){
-    #     model.temp <- paste0("\n ", model.user$lhs[i], model.user$op[i], model.stat.var.to.add[j])
-    #     model.to.add <- paste0(model.to.add, model.temp)
-    #   }
-    # }
   }
 
-  model.remove.network.var <- model.user[-model.to.remove.index, ]
+  if (!is.null(model.to.remove.index)){
+    model.remove.network.var <- model.user[-model.to.remove.index, ]
+  }
+
   model.non.network.var <- ""
   for (i in 1:nrow(model.remove.network.var)){
     model.non.network.var.temp <- paste0(paste0(model.remove.network.var[i, c('lhs', 'op', 'rhs')], collapse = ' '))

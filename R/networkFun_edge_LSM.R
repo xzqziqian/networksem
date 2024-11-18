@@ -174,16 +174,6 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
         model.to.add <- paste0(model.to.add, model.temp)
       }
     }
-    ## left is latent position and right is others
-    # if (grepl("lp.", model.user$rhs[i], fixed = TRUE) && (!(model.user$lhs[i] %in% model.network.var))){
-    #   ## if it is, record the index i and create new model items
-    #   model.to.remove.index <- c(model.to.remove.index, i)
-    #   model.stat.var.to.add <- latent.vars[[substring(model.user$rhs[i], 4)]]
-    #   for (j in 1:length(model.stat.var.to.add)){
-    #     model.temp <- paste0("\n ", model.user$lhs[i], model.user$op[i], model.stat.var.to.add[j])
-    #     model.to.add <- paste0(model.to.add, model.temp)
-    #   }
-    # }
   }
 
 
@@ -203,16 +193,6 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
 
 
 
-  # if (length(variables.to.change)>0){
-  #   for (i in 1:nrow(data)){
-  #     for (j in 1:nrow(data)){
-  #       for (vind in 1:length(variables.to.change)){
-  #         data_edge[j+(i-1)*nrow(data),variables.to.change[vind]]=data[i, variables.to.change[vind]]-data[j, variables.to.change[vind]]
-  #       }
-  #     }
-  #   }
-  # }
-  #
 
   lavparams <- list()
   for (i in 1:length(params)){

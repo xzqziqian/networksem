@@ -1,5 +1,6 @@
 library(networksem)
-
+library(DiagrammeR)
+library(RAMpath)
 
 #################  simulated data
 set.seed(100)
@@ -75,48 +76,14 @@ res <- sem.net(model=model, data=data,
 ## results
 summary(res)
 
-## the actual data used for model
-str(res$data)
-mean(res$data$nonnetwork$wechat.degree)
-## calculate mediation effect
-pars <- parameterEstimates(res$estimates)
-predictor = c("Extroversion")
-mediator = c("friends.degree", "friends.betweenness", "friends.closeness")
-outcome = c("Happiness")
-effect_table <- expand.grid("predictor" = predictor,
-                            "mediator" = mediator,
-                            "outcome" = outcome)
-effect_table$apath = NA; effect_table$bpath = NA; effect_table$indirect = NA
-effect_table$apath_se = NA; effect_table$bpath_se = NA;
-for (i in 1:nrow(effect_table)){
-  effect_table$apath[i] <- pars[pars$rhs == effect_table$predictor[i] & pars$lhs == effect_table$mediator[i], "est"]
-  effect_table$apath_se[i] <- pars[pars$rhs == effect_table$predictor[i] & pars$lhs == effect_table$mediator[i], "se"]
-  effect_table$bpath[i] <- pars[pars$rhs == effect_table$mediator[i] & pars$lhs == effect_table$outcome[i], "est"]
-  effect_table$bpath_se[i] <- pars[pars$rhs == effect_table$mediator[i] & pars$lhs == effect_table$outcome[i], "se"]
-  effect_table$indirect[i] <- effect_table$apath[i]*effect_table$bpath[i]
-}
-
-effect_table
-
-
-# extract loadings etc
-
-vals <- lavInspect(res$estimates, what="est")
-# factor loadings
-# kable(round(vals$lambda,2)[,1:6], booktab=T, format = "latex")
-# error covariance
-# vals$theta
-# regression coefficients
-# vals$beta
-# observed variable covariance
-# vals$psi
-
 
 plot.res <- lavaan2ram(res$estimates, ram.out = F)
 plot.res.path <- ramPathBridge(plot.res, F, F)
 plot(plot.res.path, 'ex1', output.type='dot')
 
 grViz('ex1.dot')
+
+path.networksem(res, 'Agreeableness', c('friends.degree', 'friends.betweenness', 'friends.closeness'), 'Happiness')
 
 ## Wald statistics for two loadings
 W <- coef(res$estimates)[2:3] %*% solve(vcov(res$estimates)[2:3, 2:3]) %*% coef(res$estimates)[2:3]

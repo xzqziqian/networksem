@@ -118,16 +118,6 @@ sem.net.edge <- function(model = NULL, data = NULL, type = "difference",
   }
 
 
-  # if (length(variables.to.change)>0){
-  #   for (i in 1:nrow(data)){
-  #     for (j in 1:nrow(data)){
-  #       for (vind in 1:length(variables.to.change)){
-  #         data_edge[j+(i-1)*nrow(data),variables.to.change[vind]]=data[i, variables.to.change[vind]]-data[j, variables.to.change[vind]]
-  #       }
-  #     }
-  #   }
-  # }
-  #
 
   lavparams <- list()
   for (i in 1:length(params)){

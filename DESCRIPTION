@@ -12,8 +12,7 @@ Authors@R:
            family = "Xu",
            role = c("aut")))
 Maintainer: Zhiyong Zhang <johnnyzhz@gmail.com>
-Description: Performs the estimation of SEM with networkdata.
-Depends: sna, igraph, influential, lavaan, latentnet, ergm, network
+Description: Performs the estimation of SEM with network data.
 License: GPL
 Imports: sna, igraph, influential, lavaan, latentnet, ergm, network
 Encoding: UTF-8

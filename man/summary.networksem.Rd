@@ -4,13 +4,15 @@
 \alias{summary.networksem}
 \title{Summarize output from networksem}
 \usage{
-\method{summary}{networksem}(res)
+\method{summary}{networksem}(object, ...)
 }
 \arguments{
-\item{res}{a networksem output file}
+\item{object}{a networksem sem.net output}
+
+\item{...}{optional arguments}
 }
 \value{
-a summary of the networksem output
+a summary of the output
 }
 \description{
 Summarize output from networksem

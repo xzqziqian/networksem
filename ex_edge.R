@@ -70,4 +70,9 @@ set.seed(100)
 res <- sem.net.edge(model = model, data = data, data.rescale = F, netstats.rescale = T,
                     network = network, type = "difference", ordered = c("cowork", "advice"))
 summary(res)
+path.networksem(res, "gender", "advice", "cowork")
+
+plot.res <- lavaan2ram(res$estimates, ram.out = F)
+plot.res.path <- ramPathBridge(plot.res, F, F)
+plot(plot.res.path, 'exedge', output.type='dot')
 

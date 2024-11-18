@@ -1,3 +1,6 @@
+library(networksem)
+library(DiagrammeR)
+library(RAMpath)
 
 
 ############ simulated data
@@ -22,7 +25,7 @@ data = list(network = list(net = net), nonnetwork = nonnet)
 set.seed(100)
 res <- sem.net.lsm(model = model, data = data, latent.dim = 2)
 summary(res)
-path.networksem(res, 'lv2', c('net.Z1', 'net.Z2'), 'lv1') # indirect effect, can have multiple mediators.
+path.networksem(res, 'lv2', c('net.Z1', 'net.Z2'), 'lv1')
 
 
 
@@ -69,29 +72,12 @@ set.seed(100)
 res <- sem.net.lsm(model=model,data=data, latent.dim = 2, data.rescale = T)
 
 
-### write a new summary function
 ## results
 summary(res)
-plot(res$estimates$lsm.es[[1]])
-plot(res$estimates$lsm.es[[2]])
-str(res$data)
+path.networksem(res, 'Agreeableness', c('friends.Z1', 'friends.Z2'), 'Happiness')
 
-## calculate mediation effect
-pars <- parameterEstimates(res$estimates$sem.es)
-predictor = c("Extroversion")
-mediator = c("friends.Z1", "friends.Z2")
-outcome = c("Happiness")
-effect_table <- expand.grid("predictor" = predictor,
-                            "mediator" = mediator,
-                            "outcome" = outcome)
-effect_table$apath = NA; effect_table$bpath = NA; effect_table$indirect = NA
-effect_table$apath_se = NA; effect_table$bpath_se = NA;
-for (i in 1:nrow(effect_table)){
-  effect_table$apath[i] <- pars[pars$rhs == effect_table$predictor[i] & pars$lhs == effect_table$mediator[i], "est"]
-  effect_table$apath_se[i] <- pars[pars$rhs == effect_table$predictor[i] & pars$lhs == effect_table$mediator[i], "se"]
-  effect_table$bpath[i] <- pars[pars$rhs == effect_table$mediator[i] & pars$lhs == effect_table$outcome[i], "est"]
-  effect_table$bpath_se[i] <- pars[pars$rhs == effect_table$mediator[i] & pars$lhs == effect_table$outcome[i], "se"]
-  effect_table$indirect[i] <- effect_table$apath[i]*effect_table$bpath[i]
-}
+plot.res <- lavaan2ram(res$estimates$sem.es, ram.out = F)
+plot.res.path <- ramPathBridge(plot.res, F, F)
+plot(plot.res.path, 'exnodelsm', output.type='dot')
 
-effect_table
+

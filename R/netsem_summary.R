@@ -1,9 +1,11 @@
 #' Summarize output from networksem
-#' @param res a networksem output file
-#' @return a summary of the networksem output
+#' @param object a networksem sem.net output
+#' @param ... optional arguments
+#' @return a summary of the output
 #' @export
-summary.networksem <- function(res){
+summary.networksem <- function(object,...){
 
+  res = object
   otype = "obs"
   if (class(res$estimates)=="list"){
     otype = "lsm"
@@ -12,7 +14,6 @@ summary.networksem <- function(res){
 #   cat("The reconstructed model:\n")
 #   cat(res$model)
 #   cat("\n\n")
-
 
   if (otype == "obs"){
     lvsummary <- getMethod("summary",signature(object="lavaan"))
@@ -48,8 +49,11 @@ summary.networksem <- function(res){
   }
 }
 
-#' Summarize output from networksem
+#' Calculate a mediation effect from a networksem model
 #' @param res a networksem output file
+#' @param predictor a character string of the predictor variable
+#' @param mediator a character string of the mediator variable
+#' @param outcome a character string of the outcome variable
 #' @return a target path
 #' @export
 path.networksem <- function(res, predictor, mediator, outcome){
@@ -100,7 +104,6 @@ path.networksem <- function(res, predictor, mediator, outcome){
 
   }
 
-  # print(effect_table)
   return(effect_table)
 }
 

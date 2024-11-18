@@ -5,8 +5,8 @@
 set.seed(10)
 nsamp = 50
 lv1 <- rnorm(nsamp)
-net <- ifelse(matrix(rnorm(nsamp^2) + lv1 %*% t(lv1), nsamp, nsamp) > 1, 1, 0)
-lv2 <- rnorm(nsamp) + rowSums(net)
+net <- ifelse(matrix(rnorm(nsamp^2) , nsamp, nsamp) > 1, 1, 0)
+lv2 <- rnorm(nsamp)
 nonnet <- data.frame(x1 = lv1*0.5 + rnorm(nsamp),
                      x2 = lv1*0.8 + rnorm(nsamp),
                      x3 = lv2*0.5 + rnorm(nsamp),
@@ -45,3 +45,6 @@ res <- sem.net.edge.lsm(model=model,data=data, type = "difference", latent.dim =
 summary(res)
 path.networksem(res, "wealth","flo.dists", "priorates")
 
+plot.res <- lavaan2ram(res$estimates$sem.es, ram.out = F)
+plot.res.path <- ramPathBridge(plot.res, F, F)
+plot(plot.res.path, 'exedgelsm', output.type='dot')
