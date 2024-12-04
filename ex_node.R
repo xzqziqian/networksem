@@ -1,6 +1,7 @@
 library(networksem)
 library(DiagrammeR)
 library(RAMpath)
+library(igraphdata)
 
 #################  simulated data
 set.seed(100)
@@ -27,10 +28,24 @@ summary(res)
 path.networksem(res, "lv2", c("net.degree"), "lv1")
 
 
+
+################# UK faculty example
+
+data(UKfaculty)
+nonnet <- as.data.frame(get.vertex.attribute(UKfaculty))
+net <- as.matrix(as_adjacency_matrix(UKfaculty))
+data = list(network = list(net = net), nonnetwork = nonnet)
+set.seed(100)
+model <-'
+  net ~ Group
+'
+res <- sem.net(model = model, data = data, netstats = c('degree', 'betweenness'))
+summary(res)
+
 ################# friendship and wechat data
 
 # load data
-load("data/cf_data_book.RData")  ## load the list cf_data
+load("../data/cf_data_book.RData")  ## load the list cf_data
 
 ## data - non-network variables
 non_network <- as.data.frame(cf_data$cf_nodal_cov)
@@ -54,10 +69,9 @@ model <-'
                 + personality14 + personality19
   Agreeableness =~ personality5 + personality10 +
                 personality15 + personality20
-  Happiness =~ happy1 + happy2 + happy3 + happy4
-  friends ~ Extroversion + Conscientiousness + Neuroticism +
-  Openness + Agreeableness
-  Happiness ~ friends + wechat
+  Depress =~ depress1 + depress2 + depress3 + depress4 + depress5 + depress6 + depress7
+  friends ~ Extroversion + Conscientiousness + Neuroticism + Openness + Agreeableness
+  Depress ~ friends + wechat + Extroversion + Conscientiousness + Neuroticism + Openness + Agreeableness
 '
 
 ## run sem.net
@@ -68,7 +82,7 @@ data = list(
 
 set.seed(100)
 res <- sem.net(model=model, data=data,
-               netstats=c("degree", "betweenness", "closeness"),
+               netstats=c("degree"),
                netstats.rescale = T,
                netstats.options=list("degree"=list("cmode"="freeman")))
 
@@ -80,10 +94,9 @@ summary(res)
 plot.res <- lavaan2ram(res$estimates, ram.out = F)
 plot.res.path <- ramPathBridge(plot.res, F, F)
 plot(plot.res.path, 'ex1', output.type='dot')
-
 grViz('ex1.dot')
 
-path.networksem(res, 'Agreeableness', c('friends.degree', 'friends.betweenness', 'friends.closeness'), 'Happiness')
+path.networksem(res, 'Agreeableness', 'friends.degree', 'Depress')
 
 ## Wald statistics for two loadings
 W <- coef(res$estimates)[2:3] %*% solve(vcov(res$estimates)[2:3, 2:3]) %*% coef(res$estimates)[2:3]

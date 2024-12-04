@@ -115,10 +115,13 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
   }
 
   model.non.network.var <- ""
-  for (i in 1:nrow(model.remove.network.var)){
-    model.non.network.var.temp <- paste0(paste0(model.remove.network.var[i, c('lhs', 'op', 'rhs')], collapse = ' '))
-    model.non.network.var <- paste0(model.non.network.var.temp, "\n", model.non.network.var)
+  if(nrow(model.remove.network.var) > 0){
+    for (i in 1:nrow(model.remove.network.var)){
+      model.non.network.var.temp <- paste0(paste0(model.remove.network.var[i, c('lhs', 'op', 'rhs')], collapse = ' '))
+      model.non.network.var <- paste0(model.non.network.var.temp, "\n", model.non.network.var)
+    }
   }
+
 
   model.full <- paste0(model.non.network.var, "\n", model.to.add)
 

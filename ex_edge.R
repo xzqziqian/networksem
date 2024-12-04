@@ -53,12 +53,12 @@ res <- sem.net.edge(model=model,data=data, type = 'average',  nestats.rescale = 
 summary(res)
 
 ################### attorney data
-non_network <- read.table("data/attorney/ELattr.dat")[,c(3,5)]
+non_network <- read.table("../data/attorney/ELattr.dat")[,c(3,5)]
 colnames(non_network) <- c('gender', 'years')
 non_network$gender <- non_network$gender - 1
 network <- list()
-network$advice <- read.table("data/attorney/ELadv.dat")
-network$cowork <- read.table("data/attorney/ELwork.dat")
+network$advice <- read.table("../data/attorney/ELadv.dat")
+network$cowork <- read.table("../data/attorney/ELwork.dat")
 
 model <-'
   advice ~ gender + years

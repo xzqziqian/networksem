@@ -26,7 +26,7 @@ path.networksem(res, 'lv2', c('net.dists'), 'lv1')
 
 ######################## real data example
 library(networksem)
-load("data/flomarriage.RData")
+load("../data/flomarriage.RData")
 
 network <- list()
 network$flo <- flomarriage.network

@@ -1,7 +1,9 @@
 library(networksem)
 library(DiagrammeR)
 library(RAMpath)
-
+library(latentnet)
+library(igraph)
+library(igraphdata)
 
 ############ simulated data
 set.seed(10)
@@ -26,6 +28,19 @@ set.seed(100)
 res <- sem.net.lsm(model = model, data = data, latent.dim = 2)
 summary(res)
 path.networksem(res, 'lv2', c('net.Z1', 'net.Z2'), 'lv1')
+
+################# UK faculty example
+
+data(UKfaculty)
+nonnet <- as.data.frame(get.vertex.attribute(UKfaculty))
+net <- as.matrix(as_adjacency_matrix(UKfaculty))
+data = list(network = list(net = net), nonnetwork = nonnet)
+set.seed(100)
+model <-'
+  net ~ Group
+'
+res <- sem.net.lsm(model = model, data = data, latent.dim = 2)
+summary(res)
 
 
 
