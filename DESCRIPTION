@@ -1,7 +1,7 @@
 Package: networksem
 Type: Package
-Title: SEM with network data
-Version: 0.1.0
+Title: Network Structural Equation Modeling
+Version: 1.0.0
 Authors@R: 
   c(person(given = "Zhiyong",
            family = "Zhang",
@@ -12,9 +12,9 @@ Authors@R:
            family = "Xu",
            role = c("aut")))
 Maintainer: Zhiyong Zhang <johnnyzhz@gmail.com>
-Description: Performs the estimation of SEM with network data.
+Description: networksem is an R package for the analysis of network data within the Structural Equation Modeling (SEM) framework. The package provides different functions to transform network data into SEM compaible formats by focusing on either nodes or edges in the network as the units of analysis. 
 License: GPL
 Imports: sna, igraph, influential, lavaan, latentnet, ergm, network
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3

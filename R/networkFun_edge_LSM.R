@@ -15,6 +15,30 @@
 #' @param ... optional arguments for the sem() function
 #' @return the updated model specification with the network statistics as variables and a lavaan object which is the SEM results, also the data generated
 #' @export
+#' @examples
+#' \dontrun{
+#' \donttest{
+#' set.seed(10)
+#' nsamp = 20
+#' lv1 <- rnorm(nsamp)
+#' net <- ifelse(matrix(rnorm(nsamp^2) , nsamp, nsamp) > 1, 1, 0)
+#' lv2 <- rnorm(nsamp)
+#' nonnet <- data.frame(x1 = lv1*0.5 + rnorm(nsamp),
+#'                      x2 = lv1*0.8 + rnorm(nsamp),
+#'                      x3 = lv2*0.5 + rnorm(nsamp),
+#'                      x4 = lv2*0.8 + rnorm(nsamp))
+#'
+#' model <-'
+#'   lv1 =~ x1 + x2
+#'   lv2 =~ x3 + x4
+#'   net ~ lv1
+#'   lv2 ~ net
+#' '
+#' data = list(network = list(net = net), nonnetwork = nonnet)
+#' set.seed(100)
+#' res <- sem.net.edge.lsm(model = model, data = data, latent.dim = 1)
+#' summary(res)
+#' }}
 sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
                              latent.dim = 2, data.rescale = FALSE,
                     ordered = NULL, sampling.weights = NULL,

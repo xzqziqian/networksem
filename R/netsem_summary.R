@@ -1,5 +1,5 @@
 #' Summarize output from networksem
-#' @param object a networksem sem.net output
+#' @param object a networksem output
 #' @param ... optional arguments
 #' @return a summary of the output
 #' @export
@@ -48,13 +48,15 @@ summary.networksem <- function(object,...){
     }
   }
 }
+.S3method("summary", "networksem", "summary.networksem")
+
 
 #' Calculate a mediation effect from a networksem model
 #' @param res a networksem output file
 #' @param predictor a character string of the predictor variable
 #' @param mediator a character string of the mediator variable
 #' @param outcome a character string of the outcome variable
-#' @return a target path
+#' @return a target path, associated estimates, and z-score
 #' @export
 path.networksem <- function(res, predictor, mediator, outcome){
   # only allow 1 predictor and 1 outcome

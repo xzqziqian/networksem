@@ -10,7 +10,6 @@
 #' @param netstats.rescale a logical value indicating whether to rescale network statistics to have mean 0 and sd 1
 #' @param netstats.options a list with names being the argument names for calculating the network statistics, and values being the argument values
 #' @return a list with the first value being the list of network statistics names and the second value being the data frame with added network statistics
-#' @export
 sem.net.addvar.stat <- function(model.network.stat.var.list, data, model.network.var.i, stats, statsname, netstats.rescale, netstats.options=NULL){
   degree <- sna::degree
   betweenness <- sna::betweenness
@@ -46,7 +45,6 @@ sem.net.addvar.stat <- function(model.network.stat.var.list, data, model.network
 #' @param netstats.rescale a logical value indicating whether to rescale network statistics to have mean 0 and sd 1
 #' @param netstats.options a list with names being the argument names for calculating the network statistics, and values being the argument values
 #' @return a list with the first value being the list of network statistics names and the second value being the data frame with added network statistics
-#' @export
 sem.net.addvar.influential <- function(model.network.stat.var.list, data, model.network.var.i, stats, statsname, netstats.rescale, netstats.options=NULL){
   ## create the network stats variable name
   model.network.stat.var <- paste0(model.network.var.i, ".", statsname)
@@ -79,7 +77,6 @@ sem.net.addvar.influential <- function(model.network.stat.var.list, data, model.
 #' @param netstats.rescale a logical value indicating whether to rescale network statistics to have mean 0 and sd 1
 #' @param netstats.options a list with element names corresponding to the network statistics and element values corresponding to another list. The list corresponding to each network statistics has element names being the argument names for calculating the network statistics, and values being the argument values
 #' @return a list with the first value being the list of network statistics names and the second value being the data frame with added network statistics variables
-#' @export
 sem.net.addvar <- function(model.network.stat.var.list=NULL, data=NULL, netstats=NULL, model.network.var.i=NULL, netstats.rescale=TRUE, netstats.options=NULL){
   res.list<-list()
   for (stat in netstats){
@@ -114,7 +111,38 @@ sem.net.addvar <- function(model.network.stat.var.list=NULL, data=NULL, netstats
 #' @param NACOV parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator
 #' @param ... optional arguments for the sem() function
 #' @return the updated model specification with the network statistics as variables and a lavaan object which is the SEM results
+#' @import lavaan
+#' @import sna
+#' @import igraph
+#' @import influential
+#' @import latentnet
+#' @import ergm
+#' @import network
 #' @export
+#' @examples
+#' \donttest{
+#' set.seed(100)
+#' nsamp = 20
+#' net <- ifelse(matrix(rnorm(nsamp^2), nsamp, nsamp) > 1, 1, 0)
+#' mean(net) # density of simulated network
+#' lv1 <- rnorm(nsamp)
+#' lv2 <- rnorm(nsamp)
+#' nonnet <- data.frame(x1 = lv1*0.5 + rnorm(nsamp),
+#'                      x2 = lv1*0.8 + rnorm(nsamp),
+#'                      x3 = lv2*0.5 + rnorm(nsamp),
+#'                      x4 = lv2*0.8 + rnorm(nsamp))
+#'
+#' model <-'
+#'   lv1 =~ x1 + x2
+#'   lv2 =~ x3 + x4
+#'  net ~ lv2
+#'   lv1 ~ net + lv2
+#' '
+#' data = list(network = list(net = net), nonnetwork = nonnet)
+#' set.seed(100)
+#' res <- sem.net(model = model, data = data, netstats = c('degree'))
+#' summary(res)
+#' }
 sem.net <- function(model=NULL, data=NULL, netstats=NULL,
                     ordered = NULL, sampling.weights = NULL, data.rescale = FALSE,
                     netstats.rescale = FALSE, group = NULL, cluster = NULL,
@@ -133,7 +161,7 @@ sem.net <- function(model=NULL, data=NULL, netstats=NULL,
 
 
   ## get the variable names in the model
-  model.info <- lavParseModelString(model)
+  model.info <- lavaan::lavParseModelString(model)
   model.var <- unique(c(model.info$lhs, model.info$rhs))
 
   ## non-network data variable names
@@ -174,7 +202,7 @@ sem.net <- function(model=NULL, data=NULL, netstats=NULL,
   ## replace the network variable name with the network variable stats name
 
   ## lavaanify the model
-  model.lavaanify <- lavaanify(model)
+  model.lavaanify <- lavaan::lavaanify(model)
 
   ## get the use specified model information
   model.user <- model.lavaanify[model.lavaanify$user==1, ]
@@ -246,7 +274,7 @@ sem.net <- function(model=NULL, data=NULL, netstats=NULL,
 
   lavparams <- list()
   for (i in 1:length(params)){
-    if (names(params)[i] %in% names(lavOptions())){
+    if (names(params)[i] %in% names(lavaan::lavOptions())){
       lavparams[[names(params[i])]] <- params[[i]]
     }
   }

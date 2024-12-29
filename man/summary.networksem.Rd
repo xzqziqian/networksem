@@ -4,10 +4,10 @@
 \alias{summary.networksem}
 \title{Summarize output from networksem}
 \usage{
-\method{summary}{networksem}(object, ...)
+summary.networksem(object, ...)
 }
 \arguments{
-\item{object}{a networksem sem.net output}
+\item{object}{a networksem output}
 
 \item{...}{optional arguments}
 }

@@ -16,7 +16,7 @@ path.networksem(res, predictor, mediator, outcome)
 \item{outcome}{a character string of the outcome variable}
 }
 \value{
-a target path
+a target path, associated estimates, and z-score
 }
 \description{
 Calculate a mediation effect from a networksem model

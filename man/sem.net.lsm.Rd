@@ -53,3 +53,29 @@ the updated model specification with the network statistics as variables and a l
 \description{
 Fit a sem model with network data using node latent positions and/or network statistics as variables. User-specified network statistics will be calculated and used as variables instead of the networks themselves in the SEM.
 }
+\examples{
+\dontrun{
+\donttest{
+set.seed(10)
+nsamp = 20
+net <- ifelse(matrix(rnorm(nsamp^2), nsamp, nsamp) > 1, 1, 0)
+mean(net) # density of simulated network
+lv1 <- rnorm(nsamp)
+lv2 <- rnorm(nsamp)
+nonnet <- data.frame(x1 = lv1*0.5 + rnorm(nsamp),
+                     x2 = lv1*0.8 + rnorm(nsamp),
+                     x3 = lv2*0.5 + rnorm(nsamp),
+                     x4 = lv2*0.8 + rnorm(nsamp))
+
+model <-'
+  lv1 =~ x1 + x2
+  lv2 =~ x3 + x4
+  net ~ lv2
+  lv1 ~ net + lv2
+'
+data = list(network = list(net = net), nonnetwork = nonnet)
+set.seed(100)
+res <- sem.net.lsm(model = model, data = data, latent.dim = 2)
+summary(res)
+}}
+}
