@@ -116,11 +116,15 @@ sem.net.edge <- function(model = NULL, data = NULL, type = "difference",
   variables.to.change=c()
   for (i in 1:nrow(model.user)){
     ## check if the variable on the lhs is a nonnetwork variable
-    if (model.user$lhs[i] %in% colnames(data$nonnetwork) && !model.user$lhs[i] %in% model.network.var){
+    if (model.user$lhs[i] %in% colnames(data$nonnetwork) && !model.user$rhs[i] %in% colnames(data$nonnetwork)){
       variables.to.change <- c(variables.to.change, model.user$lhs[i])
     }
-    if (model.user$rhs[i] %in% colnames(data$nonnetwork) && !model.user$rhs[i] %in% model.network.var){
+    if (model.user$rhs[i] %in% colnames(data$nonnetwork) && !model.user$lhs[i] %in% colnames(data$nonnetwork)){
       variables.to.change <- c(variables.to.change, model.user$rhs[i])
+    }
+    if (model.user$rhs[i] %in% colnames(data$nonnetwork) && model.user$lhs[i] %in% colnames(data$nonnetwork)){
+      variables.to.change <- c(variables.to.change, model.user$rhs[i])
+      variables.to.change <- c(variables.to.change, model.user$lhs[i])
     }
   }
 

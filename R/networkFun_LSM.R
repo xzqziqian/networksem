@@ -116,7 +116,7 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
   model.to.add <- ""
   for (i in 1:nrow(model.user)){
     ## check if left is network with LSM, remake
-    if (model.user$lhs[i] %in% latent.network){
+    if (model.user$lhs[i] %in% latent.network && !model.user$rhs[i] %in% latent.network){
       model.to.remove.index <- c(model.to.remove.index, i)
       model.stat.var.to.add <- latent.vars[[model.user$lhs[i]]]
       for (j in 1:length(model.stat.var.to.add)){
@@ -125,12 +125,25 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
       }
     }
     ## check if right is network with LSM and left is other variables
-    if (model.user$rhs[i] %in% latent.network){
+    if (model.user$rhs[i] %in% latent.network && !model.user$lhs[i] %in% latent.network){
       model.to.remove.index <- c(model.to.remove.index, i)
       model.stat.var.to.add <- latent.vars[[model.user$rhs[i]]]
       for (j in 1:length(model.stat.var.to.add)){
         model.temp <- paste0("\n ",  model.user$lhs[i], model.user$op[i],  model.stat.var.to.add[j])
         model.to.add <- paste0(model.to.add, model.temp)
+      }
+    }
+    ## check if both lhs and rhs are network variables
+    if (model.user$rhs[i] %in% model.network.var  && model.user$lhs[i] %in% model.network.var){
+      ## if it is, record the index i and create new model items
+      model.to.remove.index <- c(model.to.remove.index, i)
+      model.stat.var.to.add.rhs <- latent.vars[[model.user$rhs[i]]]
+      model.stat.var.to.add.lhs <- latent.vars[[model.user$lhs[i]]]
+      for (j in 1:length(model.stat.var.to.add.rhs)){
+        for (k in 1:length(model.stat.var.to.add.lhs)){
+          model.temp <- paste0("\n", model.stat.var.to.add.lhs[j], model.user$op[i], model.stat.var.to.add.rhs[k])
+          model.to.add <- paste0(model.to.add, model.temp)
+        }
       }
     }
   }
