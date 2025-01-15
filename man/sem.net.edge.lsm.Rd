@@ -2,7 +2,7 @@
 % Please edit documentation in R/networkFun_edge_LSM.R
 \name{sem.net.edge.lsm}
 \alias{sem.net.edge.lsm}
-\title{Fit a sem model with network data using latent distances between actors as variables}
+\title{Fit a Structural Equation Model (SEM) with both network and non-network data by transforming nonnetwork data into paired values corresponding to network latent distance pairs.}
 \usage{
 sem.net.edge.lsm(
   model = NULL,
@@ -22,39 +22,39 @@ sem.net.edge.lsm(
 )
 }
 \arguments{
-\item{model}{a model specified in lavaan model syntax.}
+\item{model}{A model string specified in lavaan model syntax that includes relationships among the network and non-network variables.}
 
-\item{data}{a list containing both the non-network and network data}
+\item{data}{A list containing the data. The list has two named components, "network" and "nonnetwork"; "network" is a list of named adjacency matrices for the network data, and "nonnetwork" is the dataframe of non-network covariates.}
 
-\item{type}{"difference" for using the difference between the network statistics of the two actors as the edge covariate; "average" for using the average of the network statistics of the two actors as the edge covariate}
+\item{type}{"difference" for using the difference between the network statistics of the two actors as the edge covariate; "average" for using the average of the network statistics of the two actors as the edge covariate.}
 
-\item{latent.dim}{number of network latent dimensions to use}
+\item{latent.dim}{The number of network latent dimensions to use in extracting latent positions of network nodes.}
 
-\item{data.rescale}{whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE}
+\item{data.rescale}{TRUE or FALSE, whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE.}
 
-\item{ordered}{parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal}
+\item{ordered}{Parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal.}
 
-\item{sampling.weights}{parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data}
+\item{sampling.weights}{Parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data.}
 
-\item{group}{parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model}
+\item{group}{Parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model.}
 
-\item{cluster}{parameter same as "cluster" in the lavaan sem() function; whether to fit a cluster model}
+\item{cluster}{Parameter same as "cluster" in the lavaan sem() function; whether to fit a cluster model.}
 
-\item{netstats.rescale}{a logical value indicating whether to rescale network statistics or variables to have mean 0 and sd 1}
+\item{netstats.rescale}{TRUE or FALSE, whether to rescale the network statistics to have mean 0 and standard deviation 1, default to FALSE.}
 
-\item{constraints}{parameter same as "constraints" in the lavaan sem() function; whether to apply constraints to the model}
+\item{constraints}{Parameter same as "constraints" in the lavaan sem() function; whether to apply constraints to the model.}
 
-\item{WLS.V}{parameter same as "WLS.V" in the lavaan sem() function; whether to use WLS.V estimator}
+\item{WLS.V}{Parameter same as "WLS.V" in the lavaan sem() function; whether to use WLS.V estimator.}
 
-\item{NACOV}{parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator}
+\item{NACOV}{Parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator.}
 
-\item{...}{optional arguments for the sem() function}
+\item{...}{Optional arguments for the sem() function.}
 }
 \value{
-the updated model specification with the network statistics as variables and a lavaan object which is the SEM results, also the data generated
+A networksem object containing the updated model specification string with the reconstructed network statistics as variables, a lavaan SEM output object, and a latentnet ergmm object.
 }
 \description{
-Fit a sem model with network data using latent distances between actors as variables
+Fit a Structural Equation Model (SEM) with both network and non-network data by transforming nonnetwork data into paired values corresponding to network latent distance pairs.
 }
 \examples{
 \dontrun{

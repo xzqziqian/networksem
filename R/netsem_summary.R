@@ -1,13 +1,15 @@
-#' Summarize output from networksem
-#' @param object a networksem output
-#' @param ... optional arguments
-#' @return a summary of the output
+#' Summarize output from networksem functions includeing sem.net, sem.net.lsm, sem.net.edge, sem.net.edge.lsm.
+#' @method summary networksem
+#' @param object A networksem output object.
+#' @param ... Optional arguments.
+#' @importFrom methods getMethod signature
+#' @return a summary sheet of the networksem output.
 #' @export
 summary.networksem <- function(object,...){
 
   res = object
   otype = "obs"
-  if (class(res$estimates)=="list"){
+  if (length(res$estimates)>1){
     otype = "lsm"
   }
 
@@ -65,7 +67,7 @@ path.networksem <- function(res, predictor, mediator, outcome){
   }
 
   otype = "obs"
-  if (class(res$estimates)=="list"){
+  if (length(res$estimates)>1){
     otype = "lsm"
   }
 

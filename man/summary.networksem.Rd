@@ -2,18 +2,18 @@
 % Please edit documentation in R/netsem_summary.R
 \name{summary.networksem}
 \alias{summary.networksem}
-\title{Summarize output from networksem}
+\title{Summarize output from networksem functions includeing sem.net, sem.net.lsm, sem.net.edge, sem.net.edge.lsm.}
 \usage{
-summary.networksem(object, ...)
+\method{summary}{networksem}(object, ...)
 }
 \arguments{
-\item{object}{a networksem output}
+\item{object}{A networksem output object.}
 
-\item{...}{optional arguments}
+\item{...}{Optional arguments.}
 }
 \value{
-a summary of the output
+a summary sheet of the networksem output.
 }
 \description{
-Summarize output from networksem
+Summarize output from networksem functions includeing sem.net, sem.net.lsm, sem.net.edge, sem.net.edge.lsm.
 }

@@ -9,11 +9,15 @@
 #' @param statsname name of the network statistics
 #' @param netstats.rescale a logical value indicating whether to rescale network statistics to have mean 0 and sd 1
 #' @param netstats.options a list with names being the argument names for calculating the network statistics, and values being the argument values
+#' @importFrom sna degree betweenness closeness evcent stresscent infocent
 #' @return a list with the first value being the list of network statistics names and the second value being the data frame with added network statistics
 sem.net.addvar.stat <- function(model.network.stat.var.list, data, model.network.var.i, stats, statsname, netstats.rescale, netstats.options=NULL){
-  degree <- sna::degree
-  betweenness <- sna::betweenness
-  closeness <- sna::closeness
+  # degree <- sna::degree
+  # betweenness <- sna::betweenness
+  # closeness <- sna::closeness
+  # evcent <- sna::evcent
+  # stresscent <- sna::stresscent
+  # infocent <- sna::infocent
   ## create the network stats variable name
   model.network.stat.var <- paste0(model.network.var.i, ".", statsname)
 
@@ -44,8 +48,18 @@ sem.net.addvar.stat <- function(model.network.stat.var.list, data, model.network
 #' @param statsname name of the network statistics
 #' @param netstats.rescale a logical value indicating whether to rescale network statistics to have mean 0 and sd 1
 #' @param netstats.options a list with names being the argument names for calculating the network statistics, and values being the argument values
+#' @importFrom influential ivi
+#' @importFrom influential spreading.score
+#' @importFrom influential hubness.score
+#' @importFrom influential clusterRank
+#' @importFrom igraph graph_from_adjacency_matrix
 #' @return a list with the first value being the list of network statistics names and the second value being the data frame with added network statistics
 sem.net.addvar.influential <- function(model.network.stat.var.list, data, model.network.var.i, stats, statsname, netstats.rescale, netstats.options=NULL){
+  # ivi <- influential::ivi
+  # spreading.score <- influential::spreading.score
+  # hubness.score <- influential::hubness.score
+  # clusterRank <- influential::clusterRank
+
   ## create the network stats variable name
   model.network.stat.var <- paste0(model.network.var.i, ".", statsname)
 
@@ -95,28 +109,23 @@ sem.net.addvar <- function(model.network.stat.var.list=NULL, data=NULL, netstats
 }
 
 
-#' Fit a sem model with network data using node statistics as variables. User-specified network statistics will be calculated and used as variables instead of the networks themselves in the SEM.
-#' @param model a model specified in lavaan model syntax.
-#' @param data a list containing the observed non-network nodal variables and the network data
-#' @param netstats a user-specified list of network statistics to be calculated and used in the SEM, e.g., c("degree", "betweenness"), available options include "degree", "betweenness", "closeness", "evcent", "stresscent", and "infocent" from the "sna" package and "ivi", "hubness.score", "spreading.score" and "clusterRank" from the "influential" package
-#' @param netstats.options a user-specified named list with element names corresponding to the network statistics names and element values corresponding to other lists. The list corresponding to each network statistics name has element names being the argument names for calculating the network statistics, and values being the argument values, as used in the corresponding functions in the "sna" or "influential" packages. e.g., netstats.options=list("degree"=list("cmode"="freeman"), "closeness"=list("cmode"="undirected"), "clusterRank"=list("directed"=FALSE))
-#' @param netstats.rescale a list of logical value indicating whether to rescale network statistics to have mean 0 and sd 1.
-#' @param data.rescale whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE
-#' @param ordered parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal
-#' @param sampling.weights parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data
-#' @param group parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model
-#' @param cluster parameter same as "cluster" in the lavaan sem() function; whether to fit a cluster model
-#' @param constraints parameter same as "constraints" in the lavaan sem() function; whether to apply constraints to the model
-#' @param WLS.V parameter same as "WLS.V" in the lavaan sem() function; whether to use WLS.V estimator
-#' @param NACOV parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator
-#' @param ... optional arguments for the sem() function
-#' @return the updated model specification with the network statistics as variables and a lavaan object which is the SEM results
+#' Fit a Structural Equation Model (SEM) with both network and non-network data by incorporating node-level network statistics as variables.
+#' @param model A model string specified in lavaan model syntax that includes relationships among the network and non-network variables.
+#' @param data A list containing the data. The list has two named components, "network" and "nonnetwork"; "network" is a list of named adjacency matrices for the network data, and "nonnetwork" is the dataframe of non-network covariates.
+#' @param netstats A user-specified list of network statistics to be calculated and used in the SEM. Available options include "degree", "betweenness", "closeness", "evcent", "stresscent", and "infocent" from the "sna" package and "ivi", "hubness.score", "spreading.score" and "clusterRank" from the "influential" package.
+#' @param netstats.options A user-specified named list with element names corresponding to the network statistics names and element values corresponding to options for that network statistics used as optional arguments in the corresponding functions in the "sna" or "influential" packages. e.g., netstats.options=list("degree"=list("cmode"="freeman"), "closeness"=list("cmode"="undirected"), "clusterRank"=list("directed"=FALSE)).
+#' @param netstats.rescale TRUE or FALSE, whether to rescale the network statistics to have mean 0 and standard deviation 1, default to FALSE.
+#' @param data.rescale TRUE or FALSE, whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE.
+#' @param ordered Parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal.
+#' @param sampling.weights Parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data.
+#' @param group Parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model.
+#' @param cluster Parameter same as "cluster" in the lavaan sem() function; whether to fit a cluster model.
+#' @param constraints Parameter same as "constraints" in the lavaan sem() function; whether to apply constraints to the model.
+#' @param WLS.V Parameter same as "WLS.V" in the lavaan sem() function; whether to use WLS.V estimator.
+#' @param NACOV Parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator.
+#' @param ... Optional arguments for the sem() function.
+#' @return A networksem object containing the updated model specification string with the reconstructed network statistics as variables and a lavaan SEM object.
 #' @import lavaan
-#' @import sna
-#' @import igraph
-#' @import influential
-#' @import latentnet
-#' @import ergm
 #' @import network
 #' @export
 #' @examples
@@ -259,18 +268,6 @@ sem.net <- function(model=NULL, data=NULL, netstats=NULL,
 
 
   model.full <- paste0(model.non.network.var, "\n", model.to.add)
-
-  # if(!is.null(community)){
-  #   communities_clust <- cutree(sna::equiv.clust(network)$cluster, k=community)
-  #   data["communities_clust"]<-communities_clust
-  # }
-  #
-
-  # if(!is.null(community) || !is.null(group)){
-  #   group <- ifelse(!is.null(community), "communities_clust", group)
-  # }
-  #
-
 
   lavparams <- list()
   for (i in 1:length(params)){

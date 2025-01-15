@@ -2,7 +2,7 @@
 % Please edit documentation in R/networkFun.R
 \name{sem.net}
 \alias{sem.net}
-\title{Fit a sem model with network data using node statistics as variables. User-specified network statistics will be calculated and used as variables instead of the networks themselves in the SEM.}
+\title{Fit a Structural Equation Model (SEM) with both network and non-network data by incorporating node-level network statistics as variables.}
 \usage{
 sem.net(
   model = NULL,
@@ -22,39 +22,39 @@ sem.net(
 )
 }
 \arguments{
-\item{model}{a model specified in lavaan model syntax.}
+\item{model}{A model string specified in lavaan model syntax that includes relationships among the network and non-network variables.}
 
-\item{data}{a list containing the observed non-network nodal variables and the network data}
+\item{data}{A list containing the data. The list has two named components, "network" and "nonnetwork"; "network" is a list of named adjacency matrices for the network data, and "nonnetwork" is the dataframe of non-network covariates.}
 
-\item{netstats}{a user-specified list of network statistics to be calculated and used in the SEM, e.g., c("degree", "betweenness"), available options include "degree", "betweenness", "closeness", "evcent", "stresscent", and "infocent" from the "sna" package and "ivi", "hubness.score", "spreading.score" and "clusterRank" from the "influential" package}
+\item{netstats}{A user-specified list of network statistics to be calculated and used in the SEM. Available options include "degree", "betweenness", "closeness", "evcent", "stresscent", and "infocent" from the "sna" package and "ivi", "hubness.score", "spreading.score" and "clusterRank" from the "influential" package.}
 
-\item{ordered}{parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal}
+\item{ordered}{Parameter same as "ordered" in the lavaan sem() function; whether to treat data as ordinal.}
 
-\item{sampling.weights}{parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data}
+\item{sampling.weights}{Parameter same as "sampling.weights" in the lavaan sem() function; whether to apply weights to data.}
 
-\item{data.rescale}{whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE}
+\item{data.rescale}{TRUE or FALSE, whether to rescale the whole dataset (with restructured network and nonnetwork data) to have mean 0 and standard deviation 1 when fitting it to SEM, default to FALSE.}
 
-\item{netstats.rescale}{a list of logical value indicating whether to rescale network statistics to have mean 0 and sd 1.}
+\item{netstats.rescale}{TRUE or FALSE, whether to rescale the network statistics to have mean 0 and standard deviation 1, default to FALSE.}
 
-\item{group}{parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model}
+\item{group}{Parameter same as "group" in the lavaan sem() function; whether to fit a multigroup model.}
 
-\item{cluster}{parameter same as "cluster" in the lavaan sem() function; whether to fit a cluster model}
+\item{cluster}{Parameter same as "cluster" in the lavaan sem() function; whether to fit a cluster model.}
 
-\item{constraints}{parameter same as "constraints" in the lavaan sem() function; whether to apply constraints to the model}
+\item{constraints}{Parameter same as "constraints" in the lavaan sem() function; whether to apply constraints to the model.}
 
-\item{WLS.V}{parameter same as "WLS.V" in the lavaan sem() function; whether to use WLS.V estimator}
+\item{WLS.V}{Parameter same as "WLS.V" in the lavaan sem() function; whether to use WLS.V estimator.}
 
-\item{NACOV}{parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator}
+\item{NACOV}{Parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator.}
 
-\item{netstats.options}{a user-specified named list with element names corresponding to the network statistics names and element values corresponding to other lists. The list corresponding to each network statistics name has element names being the argument names for calculating the network statistics, and values being the argument values, as used in the corresponding functions in the "sna" or "influential" packages. e.g., netstats.options=list("degree"=list("cmode"="freeman"), "closeness"=list("cmode"="undirected"), "clusterRank"=list("directed"=FALSE))}
+\item{netstats.options}{A user-specified named list with element names corresponding to the network statistics names and element values corresponding to options for that network statistics used as optional arguments in the corresponding functions in the "sna" or "influential" packages. e.g., netstats.options=list("degree"=list("cmode"="freeman"), "closeness"=list("cmode"="undirected"), "clusterRank"=list("directed"=FALSE)).}
 
-\item{...}{optional arguments for the sem() function}
+\item{...}{Optional arguments for the sem() function.}
 }
 \value{
-the updated model specification with the network statistics as variables and a lavaan object which is the SEM results
+A networksem object containing the updated model specification string with the reconstructed network statistics as variables and a lavaan SEM object.
 }
 \description{
-Fit a sem model with network data using node statistics as variables. User-specified network statistics will be calculated and used as variables instead of the networks themselves in the SEM.
+Fit a Structural Equation Model (SEM) with both network and non-network data by incorporating node-level network statistics as variables.
 }
 \examples{
 \donttest{
