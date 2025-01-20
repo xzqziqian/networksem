@@ -16,7 +16,6 @@
 #' @return A networksem object containing the updated model specification string with the reconstructed network statistics as variables and a lavaan SEM object.
 #' @export
 #' @examples
-#' \dontrun{
 #' \donttest{
 #' set.seed(100)
 #' nsamp = 20
@@ -39,7 +38,7 @@
 #' set.seed(100)
 #' res <- sem.net.edge(model = model, data = data, type = 'difference')
 #' summary(res)
-#' }}
+#' }
 sem.net.edge <- function(model = NULL, data = NULL, type = "difference",
                     ordered = NULL, sampling.weights = NULL, data.rescale = FALSE,
                     group = NULL, cluster = NULL, netstats.rescale = FALSE,

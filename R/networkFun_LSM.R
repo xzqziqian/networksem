@@ -14,11 +14,9 @@
 #' @param NACOV Parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator.
 #' @param ... Optional arguments for the sem() function.
 #' @return A networksem object containing the updated model specification string with the reconstructed network statistics as variables, a lavaan SEM output object, and a latentnet ergmm object.
-#' @import ergm
 #' @import latentnet
 #' @export
 #' @examples
-#' \dontrun{
 #' \donttest{
 #' set.seed(10)
 #' nsamp = 20
@@ -41,11 +39,12 @@
 #' set.seed(100)
 #' res <- sem.net.lsm(model = model, data = data, latent.dim = 2)
 #' summary(res)
-#' }}
+#' }
 sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
                     ordered = NULL, sampling.weights = NULL, data.rescale=FALSE,
                     netstats.rescale=FALSE, group = NULL, cluster = NULL,
                     constraints = "", WLS.V = NULL, NACOV = NULL, ...){
+  requireNamespace("latentnet", quietly = TRUE)
   ## checking proper input
   if(is.null(model)){
     stop("required argument model is not specified.")

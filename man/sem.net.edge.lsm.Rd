@@ -51,13 +51,12 @@ sem.net.edge.lsm(
 \item{...}{Optional arguments for the sem() function.}
 }
 \value{
-A networksem object containing the updated model specification string with the reconstructed network statistics as variables, a lavaan SEM output object, and a latentnet ergmm object.
+A networksem object containing the updated model specification string with the reconstructed network statistics as variables, a lavaan SEM output object, and a latentnet ergm object.
 }
 \description{
 Fit a Structural Equation Model (SEM) with both network and non-network data by transforming nonnetwork data into paired values corresponding to network latent distance pairs.
 }
 \examples{
-\dontrun{
 \donttest{
 set.seed(10)
 nsamp = 20
@@ -79,5 +78,5 @@ data = list(network = list(net = net), nonnetwork = nonnet)
 set.seed(100)
 res <- sem.net.edge.lsm(model = model, data = data, latent.dim = 1)
 summary(res)
-}}
+}
 }

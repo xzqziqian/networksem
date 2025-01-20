@@ -1,4 +1,6 @@
 #' Fit a Structural Equation Model (SEM) with both network and non-network data by transforming nonnetwork data into paired values corresponding to network latent distance pairs.
+#' @importFrom latentnet ergmm
+#' @import latentnet
 #' @param model A model string specified in lavaan model syntax that includes relationships among the network and non-network variables.
 #' @param data A list containing the data. The list has two named components, "network" and "nonnetwork"; "network" is a list of named adjacency matrices for the network data, and "nonnetwork" is the dataframe of non-network covariates.
 #' @param type "difference" for using the difference between the network statistics of the two actors as the edge covariate; "average" for using the average of the network statistics of the two actors as the edge covariate.
@@ -13,10 +15,9 @@
 #' @param WLS.V Parameter same as "WLS.V" in the lavaan sem() function; whether to use WLS.V estimator.
 #' @param NACOV Parameter same as "NACOV" in the lavaan sem() function; whether to use NACOV estimator.
 #' @param ... Optional arguments for the sem() function.
-#' @return A networksem object containing the updated model specification string with the reconstructed network statistics as variables, a lavaan SEM output object, and a latentnet ergmm object.
+#' @return A networksem object containing the updated model specification string with the reconstructed network statistics as variables, a lavaan SEM output object, and a latentnet ergm object.
 #' @export
 #' @examples
-#' \dontrun{
 #' \donttest{
 #' set.seed(10)
 #' nsamp = 20
@@ -38,13 +39,16 @@
 #' set.seed(100)
 #' res <- sem.net.edge.lsm(model = model, data = data, latent.dim = 1)
 #' summary(res)
-#' }}
+#' }
 sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
                              latent.dim = 2, data.rescale = FALSE,
                     ordered = NULL, sampling.weights = NULL,
                     group = NULL, cluster = NULL, netstats.rescale = FALSE,
                     constraints = "", WLS.V = NULL, NACOV = NULL,
                     ...){
+
+  requireNamespace("latentnet", quietly = TRUE)
+
   ## checking proper input
   if(is.null(model)){
     stop("required argument model is not specified.")
@@ -268,3 +272,5 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
   class(obj) <- "networksem"
   return(obj)
 }
+
+
