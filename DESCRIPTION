@@ -12,7 +12,7 @@ Authors@R:
            family = "Xu",
            role = c("aut")))
 Maintainer: Zhiyong Zhang <johnnyzhz@gmail.com>
-Description: This is an R package for the analysis of network data within the Structural Equation Modeling (SEM) framework. The package provides different functions to transform network data into SEM compaible formats by focusing on either nodes or edges in the network as the units of analysis. 
+Description: Performs analysis of network data within the Structural Equation Modeling (SEM) framework. Provides different functions to transform network data into formats compatible with SEM by focusing on either nodes or edges in the network as the units of analysis. 
 License: GPL
 Imports: sna, influential, lavaan, network, igraph, methods
 Depends: latentnet
