@@ -1,7 +1,7 @@
 Package: networksem
 Type: Package
 Title: Network Structural Equation Modeling
-Version: 1.0.0
+Version: 0.1
 Authors@R: 
   c(person(given = "Zhiyong",
            family = "Zhang",
@@ -12,7 +12,7 @@ Authors@R:
            family = "Xu",
            role = c("aut")))
 Maintainer: Zhiyong Zhang <johnnyzhz@gmail.com>
-Description: Performs analysis of network data within the Structural Equation Modeling (SEM) framework. Provides different functions to transform network data into formats compatible with SEM by focusing on either nodes or edges in the network as the units of analysis. 
+Description: Several methods have been developed to integrate structural equation modeling (SEM) techniques with network data analysis to examine the relationship between network and non-network data. Both node-based and edge-based information can be extracted from the network data to use as observed variables in SEM. To facilitate the application of these methods, model specification can be performed in the familiar syntax of the Lavaan package, ensuring ease of use for researchers.  
 License: GPL
 Imports: sna, influential, lavaan, network, igraph, methods
 Depends: latentnet
