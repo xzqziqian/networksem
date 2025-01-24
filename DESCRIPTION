@@ -1,7 +1,7 @@
 Package: networksem
 Type: Package
 Title: Network Structural Equation Modeling
-Version: 0.1
+Version: 0.2
 Authors@R: 
   c(person(given = "Zhiyong",
            family = "Zhang",
