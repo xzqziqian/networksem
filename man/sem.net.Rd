@@ -57,7 +57,6 @@ A networksem object containing the updated model specification string with the r
 Fit a Structural Equation Model (SEM) with both network and non-network data by incorporating node-level network statistics as variables.
 }
 \examples{
-\donttest{
 set.seed(100)
 nsamp = 20
 net <- ifelse(matrix(rnorm(nsamp^2), nsamp, nsamp) > 1, 1, 0)
@@ -79,5 +78,4 @@ data = list(network = list(net = net), nonnetwork = nonnet)
 set.seed(100)
 res <- sem.net(model = model, data = data, netstats = c('degree'))
 summary(res)
-}
 }

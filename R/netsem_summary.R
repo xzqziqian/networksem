@@ -20,7 +20,7 @@ summary.networksem <- function(object,...){
   if (otype == "obs"){
     lvsummary <- getMethod("summary",signature(object="lavaan"))
     cat("The SEM output:\n")
-    print(lvsummary(res$estimates, fit = T))
+    print(lvsummary(res$estimates, fit = TRUE))
   }else{
     lvsummary <- getMethod("summary",signature(object="lavaan"))
 
@@ -43,7 +43,7 @@ summary.networksem <- function(object,...){
 
     # full output
     cat("The SEM output:\n")
-    print(lvsummary(res$estimates$sem.es, fit = T))
+    print(lvsummary(res$estimates$sem.es, fit = TRUE))
     cat("The LSM output:\n")
     for (lsmout in res$estimates$lsm.es){
       print(summary(lsmout))

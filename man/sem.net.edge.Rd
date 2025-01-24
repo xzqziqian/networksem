@@ -54,7 +54,6 @@ A networksem object containing the updated model specification string with the r
 Fit a Structural Equation Model (SEM) with both network and non-network data by transforming nonnetwork data into paired values corresponding to network edge values.
 }
 \examples{
-\donttest{
 set.seed(100)
 nsamp = 20
 net <- data.frame(ifelse(matrix(rnorm(nsamp^2), nsamp, nsamp) > 1, 1, 0))
@@ -76,5 +75,4 @@ data = list(network = list(net = net), nonnetwork = nonnet)
 set.seed(100)
 res <- sem.net.edge(model = model, data = data, type = 'difference')
 summary(res)
-}
 }

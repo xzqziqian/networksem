@@ -12,7 +12,7 @@ Authors@R:
            family = "Xu",
            role = c("aut")))
 Maintainer: Zhiyong Zhang <johnnyzhz@gmail.com>
-Description: Several methods have been developed to integrate structural equation modeling (SEM) techniques with network data analysis to examine the relationship between network and non-network data. Both node-based and edge-based information can be extracted from the network data to use as observed variables in SEM. To facilitate the application of these methods, model specification can be performed in the familiar syntax of the Lavaan package, ensuring ease of use for researchers. Technical details and examples can be found at <https://bigsem.psychstat.org>. 
+Description: Several methods have been developed to integrate structural equation modeling (SEM) techniques with network data analysis to examine the relationship between network and non-network data. Both node-based and edge-based information can be extracted from the network data to be used as observed variables in SEM. To facilitate the application of these methods, model specification can be performed in the familiar syntax of the lavaan package, ensuring ease of use for researchers. Technical details and examples can be found at <https://bigsem.psychstat.org>. 
 License: GPL
 Imports: sna, influential, lavaan, network, igraph, methods
 Depends: latentnet

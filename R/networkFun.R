@@ -129,7 +129,6 @@ sem.net.addvar <- function(model.network.stat.var.list=NULL, data=NULL, netstats
 #' @import network
 #' @export
 #' @examples
-#' \donttest{
 #' set.seed(100)
 #' nsamp = 20
 #' net <- ifelse(matrix(rnorm(nsamp^2), nsamp, nsamp) > 1, 1, 0)
@@ -151,7 +150,6 @@ sem.net.addvar <- function(model.network.stat.var.list=NULL, data=NULL, netstats
 #' set.seed(100)
 #' res <- sem.net(model = model, data = data, netstats = c('degree'))
 #' summary(res)
-#' }
 sem.net <- function(model=NULL, data=NULL, netstats=NULL,
                     ordered = NULL, sampling.weights = NULL, data.rescale = FALSE,
                     netstats.rescale = FALSE, group = NULL, cluster = NULL,

@@ -57,7 +57,6 @@ A networksem object containing the updated model specification string with the r
 Fit a Structural Equation Model (SEM) with both network and non-network data by transforming nonnetwork data into paired values corresponding to network latent distance pairs.
 }
 \examples{
-\donttest{
 set.seed(10)
 nsamp = 20
 lv1 <- rnorm(nsamp)
@@ -78,5 +77,4 @@ data = list(network = list(net = net), nonnetwork = nonnet)
 set.seed(100)
 res <- sem.net.edge.lsm(model = model, data = data, latent.dim = 1)
 summary(res)
-}
 }

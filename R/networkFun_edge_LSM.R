@@ -18,7 +18,6 @@
 #' @return A networksem object containing the updated model specification string with the reconstructed network statistics as variables, a lavaan SEM output object, and a latentnet ergm object.
 #' @export
 #' @examples
-#' \donttest{
 #' set.seed(10)
 #' nsamp = 20
 #' lv1 <- rnorm(nsamp)
@@ -39,7 +38,6 @@
 #' set.seed(100)
 #' res <- sem.net.edge.lsm(model = model, data = data, latent.dim = 1)
 #' summary(res)
-#' }
 sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
                              latent.dim = 2, data.rescale = FALSE,
                     ordered = NULL, sampling.weights = NULL,
