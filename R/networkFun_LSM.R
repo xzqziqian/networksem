@@ -17,6 +17,7 @@
 #' @import latentnet
 #' @export
 #' @examples
+#' \donttest{
 #' set.seed(10)
 #' nsamp = 20
 #' net <- ifelse(matrix(rnorm(nsamp^2), nsamp, nsamp) > 1, 1, 0)
@@ -38,6 +39,7 @@
 #' set.seed(100)
 #' res <- sem.net.lsm(model = model, data = data, latent.dim = 2)
 #' summary(res)
+#' }
 sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
                     ordered = NULL, sampling.weights = NULL, data.rescale=FALSE,
                     netstats.rescale=FALSE, group = NULL, cluster = NULL,

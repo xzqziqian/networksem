@@ -54,6 +54,7 @@ A networksem object containing the updated model specification string with the r
 Fit a Structural Equation Model (SEM) with both network and non-network data by incorporating network latent positions as variables.
 }
 \examples{
+\donttest{
 set.seed(10)
 nsamp = 20
 net <- ifelse(matrix(rnorm(nsamp^2), nsamp, nsamp) > 1, 1, 0)
@@ -75,4 +76,5 @@ data = list(network = list(net = net), nonnetwork = nonnet)
 set.seed(100)
 res <- sem.net.lsm(model = model, data = data, latent.dim = 2)
 summary(res)
+}
 }
