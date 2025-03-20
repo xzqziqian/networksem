@@ -137,7 +137,7 @@ sem.net.edge.lsm <- function(model=NULL, data=NULL, type="difference",
       v_row <- rep(data$nonnetwork[variables.to.change[vind]][[1]], each = nrow(data$nonnetwork))
       v_col <- rep(data$nonnetwork[variables.to.change[vind]][[1]], nrow(data$nonnetwork))
       if (type=="difference"){
-        data_edge[variables.to.change[vind]] <- v_row - v_col
+        data_edge[variables.to.change[vind]] <- abs(v_row - v_col)
       }else if (type=="average"){
         data_edge[variables.to.change[vind]] <- (v_row + v_col)/2
       }
