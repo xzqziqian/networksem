@@ -112,7 +112,8 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
   ## get the use specified model information
   model.user <- model.lavaanify[model.lavaanify$user==1, ]
 
-
+  ## TODO: set the covariance among the latent dimensions
+  
   ## now process each part of the user specified model
   model.to.remove.index <- NULL
   model.to.add <- ""
