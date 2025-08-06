@@ -169,7 +169,7 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
 
   lavparams <- list()
   for (i in 1:length(params)){
-    if (names(params)[i] %in% names(lavOptions())){
+    if (names(params)[i] %in% names(lavaan::lavOptions())){
       lavparams[[names(params[i])]] <- params[[i]]
     }
   }
