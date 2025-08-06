@@ -67,7 +67,8 @@ sem.net.lsm <- function(model=NULL, data=NULL, latent.dim = 2,
   if (!is.null(data$network)){
     data.network.var <- names(data$network)
   }
-  latent.network = data.network.var
+  ## find the network in the model
+  latent.network = intersect(data.network.var, model.var)
 
   ## find the network variables in the model
   model.network.var <- data.network.var[data.network.var %in% model.var]
